@@ -1,0 +1,2649 @@
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { 
+  Search, ShoppingCart, Heart, User, Star, Plus, Trash, Check, X, Edit, 
+  TrendingUp, DollarSign, Package, Users, ShieldAlert, ChevronLeft, ChevronRight, 
+  MapPin, Bell, Award, ArrowRight, Upload, Filter, Grid, List, ShieldCheck, 
+  FileText, Percent, RefreshCw, BarChart2, Eye, Compass, Layout, Globe, Moon, Sun, 
+  Volume2, Settings, Lock, HelpCircle, MessageSquare, ChevronDown, CheckCircle2, 
+  AlertTriangle, BookOpen, Send, CreditCard, Activity, Briefcase, PercentSquare,
+  Building, Landmark, Download
+} from 'lucide-react';
+
+// Enterprise Multi-Vendor DB Mock Data
+const INITIAL_CATEGORIES = [
+  { id: 'electronics', name: 'Electronics', icon: '💻', banner: 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=1200&auto=format&fit=crop&q=60' },
+  { id: 'mobiles', name: 'Mobiles', icon: '📱', banner: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&auto=format&fit=crop&q=60' },
+  { id: 'fashion', name: 'Fashion', icon: '👕', banner: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&auto=format&fit=crop&q=60' },
+  { id: 'beauty', name: 'Beauty & Health', icon: '💄', banner: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1200&auto=format&fit=crop&q=60' },
+  { id: 'home', name: 'Home & Living', icon: '🏠', banner: 'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=1200&auto=format&fit=crop&q=60' },
+  { id: 'appliances', name: 'Appliances', icon: '🔌', banner: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=1200&auto=format&fit=crop&q=60' },
+  { id: 'grocery', name: 'Grocery', icon: '🍎', banner: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=1200&auto=format&fit=crop&q=60' }
+];
+
+const INITIAL_PRODUCTS = [
+  {
+    id: 'p1',
+    sku: 'BZ-EL-001',
+    name: 'ZoneBook Pro Ultra 15.6" OLED Thin & Light Laptop',
+    category: 'electronics',
+    brand: 'ZoneTech',
+    price: 89999,
+    originalPrice: 120000,
+    rating: 4.8,
+    reviews: [
+      { id: 'r1', author: 'Rohan Sen', rating: 5, text: 'Absolutely spectacular battery performance, OLED screen is stunning!', date: '2026-06-01' }
+    ],
+    seller: 'ZoneTech India',
+    sellerId: 's1',
+    stock: 12,
+    status: 'Approved',
+    featured: true,
+    specs: {
+      'Processor': 'Intel Core i7 13th Gen',
+      'RAM': '16 GB LPDDR5',
+      'Storage': '1 TB NVMe SSD',
+      'Display': '15.6" OLED UHD 4K'
+    },
+    description: 'The ultimate power notebook designed for content creators, software developers, and professionals. Experience blinding speeds and dual-fan quiet cooling systems.',
+    images: [
+      'https://images.unsplash.com/photo-1496181130204-755241524eab?w=800&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=60'
+    ]
+  },
+  {
+    id: 'p2',
+    sku: 'BZ-MO-102',
+    name: 'BUYZONE Horizon Pro 5G SmartPhone (256GB, Silk Blue)',
+    category: 'mobiles',
+    brand: 'Horizon',
+    price: 24999,
+    originalPrice: 35000,
+    rating: 4.5,
+    reviews: [
+      { id: 'r2', author: 'Maya Roy', rating: 4, text: 'Camera resolution is excellent. Fast charging is a lifesaver.', date: '2026-06-03' }
+    ],
+    seller: 'Horizon Telecom',
+    sellerId: 's2',
+    stock: 50,
+    status: 'Approved',
+    featured: true,
+    specs: {
+      'Display': '6.7 inch AMOLED 120Hz',
+      'Camera': '108MP + 12MP + 5MP',
+      'Battery': '5000 mAh with 80W Charger',
+      'Processor': 'Snapdragon 8 Gen 2'
+    },
+    description: 'Capture professional cinematic shots and explore limitless cloud capabilities with BUYZONE\'s signature sleek smartphone offering.',
+    images: [
+      'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=800&auto=format&fit=crop&q=60'
+    ]
+  },
+  {
+    id: 'p3',
+    sku: 'BZ-FA-550',
+    name: 'Signature Cotton Slim Fit Casual Shirt',
+    category: 'fashion',
+    brand: 'Vogue',
+    price: 1299,
+    originalPrice: 2999,
+    rating: 4.2,
+    reviews: [],
+    seller: 'Vogue Trends',
+    sellerId: 's3',
+    stock: 120,
+    status: 'Approved',
+    featured: false,
+    specs: {
+      'Material': '100% Premium Cotton',
+      'Fit': 'Slim Fit',
+      'Sleeve': 'Full Sleeve'
+    },
+    description: 'Tailored for perfect flexibility and sophisticated daily wear. Designed to pair seamlessly with raw denim or tailored chinos.',
+    images: [
+      'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&auto=format&fit=crop&q=60'
+    ]
+  },
+  {
+    id: 'p4',
+    sku: 'BZ-AP-091',
+    name: 'Smart RoboClean Vacuum Mop with Auto-Docking',
+    category: 'appliances',
+    brand: 'SmartClean',
+    price: 18999,
+    originalPrice: 29999,
+    rating: 4.6,
+    reviews: [
+      { id: 'r3', author: 'Amrit Pal', rating: 5, text: 'No more sweep maps! Fully automates my entire flat mapping logic.', date: '2026-06-08' }
+    ],
+    seller: 'Smart Home Automation',
+    sellerId: 's4',
+    stock: 15,
+    status: 'Approved',
+    featured: true,
+    specs: {
+      'Suction Power': '3200 Pa Super Power',
+      'Navigation': 'LDS Lidar Navigation v4',
+      'App integration': 'Alexa & Google Assistant compatibility'
+    },
+    description: 'Set schedules, monitor clean lines, and command cleaning routines via mobile with our premium autonomous robo-vacuum vacuum mop.',
+    images: [
+      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=60'
+    ]
+  }
+];
+
+const INITIAL_SELLERS = [
+  { id: 's1', name: 'ZoneTech India', owner: 'Raman Khanna', gst: '27AAAAA1111A1Z1', pan: 'ABCDE1234F', status: 'Approved', email: 'raman@zonetech.in', sales: 450000, walletBalance: 42000, shopDescription: 'Authorized flagship supplier of premium elite laptops.' },
+  { id: 's2', name: 'Horizon Telecom', owner: 'Priya Patel', gst: '24BBBBB2222B2Z2', pan: 'FGHIJ5678K', status: 'Approved', email: 'priya@horizon.com', sales: 290000, walletBalance: 18500, shopDescription: 'Direct source for top-tier smartphones and official accessories.' },
+  { id: 's3', name: 'Vogue Trends', owner: 'Siddharth Roy', gst: '19CCCCC3333C3Z3', pan: 'LMNOP9012Q', status: 'Approved', email: 'sid@vogue.co', sales: 125000, walletBalance: 9800, shopDescription: 'Designer casual and semi-formal luxury menswear.' }
+];
+
+const INITIAL_COUPONS = [
+  { code: 'BUYZONE10', type: 'percentage', value: 10, minPurchase: 1000, desc: 'Get 10% OFF on all purchases over ₹1,000' },
+  { code: 'SUPER500', type: 'flat', value: 500, minPurchase: 4999, desc: 'Flat ₹500 OFF on premium gadgets & lifestyle items' },
+  { code: 'FESTIVE20', type: 'percentage', value: 20, minPurchase: 2000, desc: 'Mega Festive offer: 20% OFF platform-wide!' }
+];
+
+export default function App() {
+  const [darkMode, setDarkMode] = useState(false);
+  const [lang, setLang] = useState('en');
+
+  // Multi-Portal Simulation State
+  // This simulates separate domains/routes within one single responsive preview
+  const [activeRoute, setActiveRoute] = useState('/customer/home'); 
+  
+  // Simulated DB states
+  const [products, setProducts] = useState(INITIAL_PRODUCTS);
+  const [sellers, setSellers] = useState(INITIAL_SELLERS);
+  const [coupons, setCoupons] = useState(INITIAL_COUPONS);
+  const [applications, setApplications] = useState([
+    {
+      id: 'app-01',
+      shopName: 'Smart Home Automation',
+      ownerName: 'Amrit Pal',
+      email: 'support@smarthome.in',
+      mobile: '+91 98765 01010',
+      gst: '03DDDDD4444D4Z4',
+      pan: 'QRSTU3456V',
+      address: '74, Cyber City Phase-3, Gurugram, HR - 122002',
+      status: 'Approved',
+      subDate: '2026-06-05',
+      logo: 'https://images.unsplash.com/photo-1558002038-1055907df827?w=100&auto=format&fit=crop&q=60',
+      banner: 'https://images.unsplash.com/photo-1558002038-1055907df827?w=800&auto=format&fit=crop&q=60'
+    },
+    {
+      id: 'app-02',
+      shopName: 'Glow Cosmeceuticals',
+      ownerName: 'Anjali Sharma',
+      email: 'sales@glowcosmetics.in',
+      mobile: '+91 88888 77777',
+      gst: '19EEEEE5555E5Z5',
+      pan: 'WXYZA7890B',
+      address: 'Salt Lake Sector-V, Kolkata, WB - 700091',
+      status: 'Pending',
+      subDate: '2026-06-09',
+      logo: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=100&auto=format&fit=crop&q=60',
+      banner: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&auto=format&fit=crop&q=60'
+    }
+  ]);
+
+  const [orders, setOrders] = useState([
+    {
+      id: 'BZ-1093',
+      date: '2026-06-08',
+      customerId: 'cust-01',
+      customerName: 'Aarav Sharma',
+      items: [
+        { id: 'p3', name: 'Signature Cotton Slim Fit Casual Shirt', price: 1299, quantity: 2, sellerId: 's3' }
+      ],
+      total: 2598,
+      status: 'Shipped',
+      shippingAddress: '42, Tech Park Enclave, Whitefield, Bengaluru, KA - 560001',
+      paymentMethod: 'UPI'
+    }
+  ]);
+
+  const [cart, setCart] = useState([
+    { product: INITIAL_PRODUCTS[1], quantity: 1 } // preloaded 1 smartphone for checkout demo
+  ]);
+  const [wishlist, setWishlist] = useState(['p1']);
+  
+  // Active Logged In Contexts
+  const [customerUser, setCustomerUser] = useState({
+    id: 'cust-01',
+    name: 'Aarav Sharma',
+    email: 'aarav.sharma@gmail.com',
+    mobile: '+91 98765 43210',
+    wallet: 1500,
+    points: 420,
+    addresses: [
+      { id: 'addr-1', tag: 'Home (Default)', detail: '42, Tech Park Enclave, Whitefield, Bengaluru, KA - 560001' },
+      { id: 'addr-2', tag: 'Office', detail: 'Tower-B, Floor 14, Cloud Square Tech Center, Whitefield, Bengaluru - 560066' }
+    ]
+  });
+
+  const [sellerUser, setSellerUser] = useState(null); // set on login
+  const [adminUser, setAdminUser] = useState(null); // set on login
+
+  // Live Notification Feed (Socket.io simulation)
+  const [notifications, setNotifications] = useState([
+    { id: 1, text: '🎉 Super Sale Live! Apply coupon FESTIVE20 for 20% discount!', type: 'info', time: 'Just now' },
+    { id: 2, text: '📋 Compliance alert: New seller application pending review.', type: 'admin', time: '1 hour ago' }
+  ]);
+
+  // Support Chat simulation
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([
+    { sender: 'bot', text: 'Hello! Welcome to BUYZONE Marketplace Support. How can we help you today?' }
+  ]);
+  const [currentChatInput, setCurrentChatInput] = useState('');
+
+  // UI helpers
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedProductId, setSelectedProductId] = useState('p1');
+  const [priceFilter, setPriceFilter] = useState(100000);
+  const [sortBy, setSortBy] = useState('popular');
+  const [enteredCoupon, setEnteredCoupon] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [activeAddressId, setActiveAddressId] = useState('addr-1');
+  const [checkoutPaymentMethod, setCheckoutPaymentMethod] = useState('UPI');
+  const [isVoiceSearching, setIsVoiceSearching] = useState(false);
+  const [recentlyViewed, setRecentlyViewed] = useState(['p1', 'p4']);
+  const [activeProductTab, setActiveProductTab] = useState('description');
+
+  // Seller Registration state fields
+  const [regShopName, setRegShopName] = useState('');
+  const [regOwnerName, setRegOwnerName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regMobile, setRegMobile] = useState('');
+  const [regGst, setRegGst] = useState('');
+  const [regPan, setRegPan] = useState('');
+  const [regAddress, setRegAddress] = useState('');
+  const [regDescription, setRegDescription] = useState('');
+
+  // Seller Product Addition state fields
+  const [newProdName, setNewProdName] = useState('');
+  const [newProdCategory, setNewProdCategory] = useState('electronics');
+  const [newProdBrand, setNewProdBrand] = useState('');
+  const [newProdPrice, setNewProdPrice] = useState('');
+  const [newProdOriginal, setNewProdOriginal] = useState('');
+  const [newProdStock, setNewProdStock] = useState('');
+  const [newProdDesc, setNewProdDesc] = useState('');
+  const [newProdSpecs, setNewProdSpecs] = useState('Origin: India\nWarranty: 1 Year');
+
+  // Customer Review states
+  const [custReviewText, setCustReviewText] = useState('');
+  const [custReviewRating, setCustReviewRating] = useState(5);
+
+  // Countdown timer calculation
+  const [timeLeft, setTimeLeft] = useState({ hours: 4, minutes: 28, seconds: 45 });
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
+        if (prev.minutes > 0) return { hours: prev.hours, minutes: prev.minutes - 1, seconds: 59 };
+        if (prev.hours > 0) return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        return { hours: 4, minutes: 0, seconds: 0 };
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Flash Banner index rotation
+  const [bannerIdx, setBannerIdx] = useState(0);
+  const BANNERS = [
+    { title: 'SUMMER MEGADEALS BANZANA!', desc: 'Extra 10% instant rebate on HDFC Credit Cards.', bg: 'from-blue-600 to-indigo-800' },
+    { title: 'FESTIVAL OF GADGETS', desc: 'Up to ₹10,000 off on premium dual OLED laptops.', bg: 'from-pink-600 to-purple-800' },
+    { title: 'ORGANIC GROCERY DISPATCH', desc: 'Sourced daily from clean agricultural spaces.', bg: 'from-teal-600 to-emerald-800' }
+  ];
+
+  useEffect(() => {
+    const bannerTimer = setInterval(() => {
+      setBannerIdx(prev => (prev + 1) % BANNERS.length);
+    }, 5000);
+    return () => clearInterval(bannerTimer);
+  }, []);
+
+  // System notification toast trigger
+  const triggerToast = (text, type = 'info') => {
+    const id = Date.now();
+    setNotifications(prev => [{ id, text, type, time: 'Just now' }, ...prev]);
+  };
+
+  const cartTotals = useMemo(() => {
+    const subtotal = cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+    const gstTax = Math.round(subtotal * 0.18); // 18% standard GST tax
+    const shipping = subtotal > 1500 || subtotal === 0 ? 0 : 150;
+    
+    let discount = 0;
+    if (appliedCoupon) {
+      if (appliedCoupon.type === 'percentage') {
+        discount = Math.round(subtotal * (appliedCoupon.value / 100));
+      } else {
+        discount = appliedCoupon.value;
+      }
+    }
+
+    const total = Math.max(0, subtotal + gstTax + shipping - discount);
+    return { subtotal, gstTax, shipping, discount, total };
+  }, [cart, appliedCoupon]);
+
+  const handleApplyCoupon = () => {
+    const code = enteredCoupon.trim().toUpperCase();
+    const found = coupons.find(c => c.code === code);
+    if (!found) {
+      triggerToast('❌ Coupon code is invalid or has expired', 'error');
+      return;
+    }
+    if (cartTotals.subtotal < found.minPurchase) {
+      triggerToast(`⚠️ Minimum purchase of ₹${found.minPurchase} required for this coupon`, 'warning');
+      return;
+    }
+    setAppliedCoupon(found);
+    triggerToast(`🎉 Coupon "${found.code}" applied successfully!`, 'success');
+  };
+
+  const handleAddToCart = (product, quiet = false) => {
+    const exists = cart.find(item => item.product.id === product.id);
+    if (exists) {
+      setCart(cart.map(item => item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item));
+    } else {
+      setCart([...cart, { product, quantity: 1 }]);
+    }
+    if (!quiet) triggerToast(`🛒 Added "${product.name}" to your cart`, 'success');
+  };
+
+  const handleUpdateCartQty = (productId, change) => {
+    setCart(cart.map(item => {
+      if (item.product.id === productId) {
+        const newQty = Math.max(1, item.quantity + change);
+        return { ...item, quantity: newQty };
+      }
+      return item;
+    }));
+  };
+
+  const handleCheckout = () => {
+    if (cart.length === 0) return;
+    const newOrderId = `BZ-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newOrder = {
+      id: newOrderId,
+      date: new Date().toISOString().split('T')[0],
+      customerId: customerUser.id,
+      customerName: customerUser.name,
+      items: cart.map(c => ({ id: c.product.id, name: c.product.name, price: c.product.price, quantity: c.quantity, sellerId: c.product.sellerId })),
+      total: cartTotals.total,
+      status: 'Ordered',
+      shippingAddress: customerUser.addresses.find(a => a.id === activeAddressId)?.detail || 'BUYZONE pickup hub',
+      paymentMethod: checkoutPaymentMethod
+    };
+
+    // Update stocks and vendor earnings simulation
+    setProducts(prevProducts => prevProducts.map(p => {
+      const bought = cart.find(c => c.product.id === p.id);
+      if (bought) {
+        return { ...p, stock: Math.max(0, p.stock - bought.quantity) };
+      }
+      return p;
+    }));
+
+    // Update Vendor sales metrics simulation
+    setSellers(prevSellers => prevSellers.map(s => {
+      const vendorItems = cart.filter(c => c.product.sellerId === s.id);
+      if (vendorItems.length > 0) {
+        const vendorSale = vendorItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+        return { 
+          ...s, 
+          sales: s.sales + vendorSale,
+          walletBalance: s.walletBalance + Math.round(vendorSale * 0.95) // 5% marketplace commission
+        };
+      }
+      return s;
+    }));
+
+    // Reward points logic (5% conversion)
+    const pointsAccrued = Math.round(cartTotals.total * 0.05);
+    setCustomerUser(prev => ({ ...prev, points: prev.points + pointsAccrued }));
+
+    setOrders([newOrder, ...orders]);
+    setCart([]);
+    setAppliedCoupon(null);
+    setEnteredCoupon('');
+    triggerToast(`🚀 Order ${newOrderId} successfully initialized! Status: Pending Delivery`, 'success');
+    setActiveRoute('/customer/orders');
+  };
+
+  const handleSellerRegister = (e) => {
+    e.preventDefault();
+    if (!regShopName || !regOwnerName || !regGst || !regEmail) {
+      triggerToast('❌ All mandatory business licensing details must be filled', 'error');
+      return;
+    }
+    const newApp = {
+      id: `app-${Date.now()}`,
+      shopName: regShopName,
+      ownerName: regOwnerName,
+      email: regEmail,
+      mobile: regMobile || '+91 99999 88888',
+      gst: regGst.toUpperCase(),
+      pan: regPan.toUpperCase() || 'ABCDE1234F',
+      address: regAddress || 'Industrial Sector-4, Noida, UP',
+      status: 'Pending',
+      subDate: new Date().toISOString().split('T')[0],
+      logo: 'https://images.unsplash.com/photo-1558002038-1055907df827?w=100&auto=format&fit=crop&q=60',
+      banner: 'https://images.unsplash.com/photo-1558002038-1055907df827?w=800&auto=format&fit=crop&q=60'
+    };
+
+    setApplications([...applications, newApp]);
+    triggerToast('📋 Business documents successfully submitted! Awaiting Admin compliance verification.', 'info');
+    
+    // Clear inputs
+    setRegShopName('');
+    setRegOwnerName('');
+    setRegEmail('');
+    setRegMobile('');
+    setRegGst('');
+    setRegPan('');
+    setRegAddress('');
+
+    setActiveRoute('/seller/login');
+  };
+
+  const handleAddNewProduct = (e) => {
+    e.preventDefault();
+    if (!newProdName || !newProdPrice || !newProdStock) {
+      triggerToast('❌ Essential fields missing (Name, Price, Stock)', 'error');
+      return;
+    }
+    const newP = {
+      id: `p-${Date.now()}`,
+      sku: `BZ-SL-${Math.floor(100 + Math.random() * 900)}`,
+      name: newProdName,
+      category: newProdCategory,
+      brand: newProdBrand || 'Generic Brand',
+      price: Number(newProdPrice),
+      originalPrice: Number(newProdOriginal) || Number(newProdPrice) * 1.25,
+      rating: 5.0,
+      reviews: [],
+      seller: sellerUser?.name || 'Local Verified Partner',
+      sellerId: sellerUser?.id || 's1',
+      stock: Number(newProdStock),
+      status: 'Approved', // instant approved for sandbox experience
+      featured: false,
+      specs: Object.fromEntries(newProdSpecs.split('\n').map(line => line.includes(':') ? line.split(':').map(x => x.trim()) : ['Details', line])),
+      description: newProdDesc || 'High quality products directly sourced from professional distribution houses.',
+      images: [
+        'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop&q=60'
+      ]
+    };
+
+    setProducts([newP, ...products]);
+    triggerToast(`🚀 "${newProdName}" added successfully and is now active on the catalog!`, 'success');
+    
+    // Clear
+    setNewProdName('');
+    setNewProdPrice('');
+    setNewProdOriginal('');
+    setNewProdStock('');
+    setNewProdDesc('');
+    setNewProdBrand('');
+
+    setActiveRoute('/seller/products');
+  };
+
+  // Support bot replies simulation
+  const handleSendChat = () => {
+    if (!currentChatInput.trim()) return;
+    const userMsg = { sender: 'user', text: currentChatInput };
+    setChatMessages(prev => [...prev, userMsg]);
+    const cleanInput = currentChatInput.toLowerCase();
+    setCurrentChatInput('');
+
+    setTimeout(() => {
+      let botText = "I have queued your support ticket. An executive will join momentarily.";
+      if (cleanInput.includes('order')) {
+        botText = "You can track your packages live using the 'Visual Order Tracking' route under Customer Orders page.";
+      } else if (cleanInput.includes('refund') || cleanInput.includes('cancel')) {
+        botText = "Refunds on UPI payments are processed within 2-4 working hours directly to your source wallet.";
+      } else if (cleanInput.includes('gst')) {
+        botText = "Sellers must possess standard 15-digit state GST credentials to initiate catalog dispatch.";
+      }
+      setChatMessages(prev => [...prev, { sender: 'bot', text: botText }]);
+    }, 1000);
+  };
+
+  // Filter & Sort core selection
+  const catalogProducts = useMemo(() => {
+    return products.filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            p.brand.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCat = selectedCategory === 'all' || p.category === selectedCategory;
+      const matchesPrice = p.price <= priceFilter;
+      return matchesSearch && matchesCat && matchesPrice;
+    }).sort((a, b) => {
+      if (sortBy === 'low-to-high') return a.price - b.price;
+      if (sortBy === 'high-to-low') return b.price - a.price;
+      if (sortBy === 'rating') return b.rating - a.rating;
+      return b.id.localeCompare(a.id); // default popularity / index
+    });
+  }, [products, searchQuery, selectedCategory, priceFilter, sortBy]);
+
+  const activeProduct = products.find(p => p.id === selectedProductId) || products[0];
+
+  return (
+    <div className={`${darkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'} min-h-screen font-sans antialiased transition-colors duration-200`}>
+      
+      {/* ENTERPRISE WORKSPACE & ROUTE SIMULATOR DECK */}
+      <div className="bg-slate-900 text-slate-100 border-b border-slate-800 text-[11px] font-mono px-4 py-3 sticky top-0 z-50 flex flex-wrap justify-between items-center gap-3">
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span className="font-bold tracking-tight text-slate-300">SANDBOX SIMULATOR DECK:</span>
+          <span className="bg-slate-800 px-2 py-0.5 rounded text-blue-400 font-bold border border-slate-700">
+            {activeRoute}
+          </span>
+        </div>
+        
+        {/* Dynamic Route Switcher for instant testing */}
+        <div className="flex flex-wrap gap-1 bg-slate-950/80 p-1 rounded-md border border-slate-800">
+          <span className="text-[10px] text-slate-400 uppercase font-black px-1.5 self-center">Portal Route Guides:</span>
+          
+          {/* Customer Group */}
+          <button 
+            onClick={() => { setActiveRoute('/customer/home'); }}
+            className={`px-2 py-1 rounded text-[10px] uppercase font-bold transition-all ${activeRoute.startsWith('/customer') ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 text-slate-300'}`}
+          >
+            🛍️ Consumer Store
+          </button>
+          
+          {/* Seller Group */}
+          <button 
+            onClick={() => { setActiveRoute('/seller/login'); }}
+            className={`px-2 py-1 rounded text-[10px] uppercase font-bold transition-all ${activeRoute.startsWith('/seller') ? 'bg-emerald-600 text-white' : 'hover:bg-slate-800 text-slate-300'}`}
+          >
+            🏪 Seller Office
+          </button>
+          
+          {/* Admin Group */}
+          <button 
+            onClick={() => { setActiveRoute('/admin/login'); }}
+            className={`px-2 py-1 rounded text-[10px] uppercase font-bold transition-all ${activeRoute.startsWith('/admin') ? 'bg-rose-600 text-white' : 'hover:bg-slate-800 text-slate-300'}`}
+          >
+            👑 Admin desk
+          </button>
+        </div>
+      </div>
+
+      {/* DYNAMIC SYSTEM ALERT POPUP AT HEADER */}
+      <div className="bg-gradient-to-r from-blue-700 to-indigo-600 dark:from-blue-900 dark:to-indigo-950 text-white text-xs px-4 py-2.5 text-center flex items-center justify-center gap-3 relative overflow-hidden">
+        <span className="bg-yellow-400 text-slate-900 text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-wider">⚡ Midnight Run</span>
+        <p className="font-semibold tracking-wide">
+          Extraordinary 18% standard Integrated GST (IGST) calculated automatically. Sale closes in 
+          <span className="text-yellow-400 ml-1.5 font-bold">
+            {timeLeft.hours.toString().padStart(2, '0')}h {timeLeft.minutes.toString().padStart(2, '0')}m {timeLeft.seconds.toString().padStart(2, '0')}s
+          </span>
+        </p>
+      </div>
+
+      {/* PORTAL CONDITIONAL RENDER ENGINE */}
+      
+      {/* ======================================= */}
+      {/* 1. CUSTOMER PORTAL PAGES               */}
+      {/* ======================================= */}
+      {activeRoute.startsWith('/customer') && (
+        <div>
+          {/* FLIPKART STYLE PREMIUM HEADER */}
+          <header className="bg-[#2874F0] text-white py-3 px-4 shadow-md sticky top-10 z-40 transition-colors">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+              
+              {/* Logo Identity */}
+              <div className="flex items-center justify-between w-full md:w-auto gap-4">
+                <div onClick={() => setActiveRoute('/customer/home')} className="cursor-pointer">
+                  <span className="text-2xl font-black tracking-wider italic text-white flex items-center">
+                    BUY<span className="text-yellow-400">ZONE</span>
+                  </span>
+                  <div className="text-[10px] -mt-1.5 text-slate-100 font-semibold flex items-center gap-1 italic">
+                    Explore <span className="text-yellow-300 font-bold flex items-center">Plus <Award size={10} className="ml-0.5 text-yellow-300" /></span>
+                  </div>
+                </div>
+
+                {/* Mobile helper icons */}
+                <div className="flex items-center gap-2 md:hidden">
+                  <button onClick={() => setDarkMode(!darkMode)} className="p-1.5 hover:bg-white/10 rounded-full">
+                    {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+                  </button>
+                  <button onClick={() => setActiveRoute('/customer/cart')} className="relative p-1.5 hover:bg-white/10 rounded-full">
+                    <ShoppingCart size={18} />
+                    {cart.length > 0 && <span className="absolute -top-1 -right-1 bg-yellow-400 text-slate-900 text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">{cart.length}</span>}
+                  </button>
+                </div>
+              </div>
+
+              {/* Advanced Search Bar with Speech Assist */}
+              <div className="w-full md:flex-1 max-w-xl relative">
+                <div className="flex bg-white text-slate-800 rounded-sm shadow-inner overflow-hidden">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search for premium products, brands, electronics and more..."
+                    className="w-full px-4 py-2 text-sm focus:outline-none placeholder:text-slate-400"
+                  />
+                  <div className="flex items-center pr-2 bg-white">
+                    <button 
+                      onClick={() => {
+                        setIsVoiceSearching(true);
+                        triggerToast('🎙️ Microphones active. Say your search query...', 'info');
+                        setTimeout(() => {
+                          setSearchQuery('OLED Laptop');
+                          setIsVoiceSearching(false);
+                          triggerToast('🔍 Search matched: "OLED Laptop"', 'success');
+                        }, 2500);
+                      }} 
+                      className={`p-1.5 rounded-full ${isVoiceSearching ? 'text-red-500 animate-pulse bg-red-100' : 'text-slate-400 hover:text-blue-600'}`}
+                    >
+                      <Volume2 size={18} />
+                    </button>
+                    <button className="p-2 text-blue-600 hover:scale-105 transition-transform">
+                      <Search size={18} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop menu controls */}
+              <div className="hidden md:flex items-center space-x-6 text-sm">
+                
+                {/* Rewards / Points claim */}
+                <button 
+                  onClick={() => {
+                    setCustomerUser(prev => ({ ...prev, points: prev.points + 50 }));
+                    triggerToast('🎁 Claimed +50 Loyalty Reward Points!', 'success');
+                  }}
+                  className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-sm flex items-center gap-1.5 text-xs text-yellow-300 font-semibold border border-yellow-400/30"
+                >
+                  <Award size={14} /> {customerUser.points} Points
+                </button>
+
+                <button 
+                  onClick={() => setActiveRoute('/customer/dashboard')} 
+                  className="hover:text-yellow-300 transition-colors flex items-center gap-1.5 font-semibold"
+                >
+                  <User size={16} /> {customerUser.name}
+                </button>
+
+                <button onClick={() => setActiveRoute('/customer/cart')} className="relative flex items-center gap-1.5 font-bold hover:text-yellow-300 transition-colors">
+                  <ShoppingCart size={18} />
+                  <span>Cart</span>
+                  {cart.length > 0 && (
+                    <span className="absolute -top-3 -right-3 bg-yellow-400 text-slate-900 text-[10px] font-black h-5 w-5 rounded-full flex items-center justify-center border-2 border-blue-600">
+                      {cart.length}
+                    </span>
+                  )}
+                </button>
+
+                <button onClick={() => setActiveRoute('/customer/dashboard')} className="hover:text-slate-200 flex items-center gap-1.5">
+                  <Heart size={16} className={wishlist.length > 0 ? 'fill-yellow-400 text-yellow-400' : ''} />
+                  <span>Wishlist</span>
+                </button>
+
+                <button onClick={() => setActiveRoute('/customer/orders')} className="hover:text-slate-200 font-semibold">
+                  Orders
+                </button>
+
+                <button 
+                  onClick={() => setActiveRoute('/seller/register')}
+                  className="bg-yellow-400 text-slate-900 font-bold px-3 py-1 rounded-sm text-xs shadow-sm hover:bg-yellow-300"
+                >
+                  Become Seller
+                </button>
+
+                <button onClick={() => setDarkMode(!darkMode)} className="p-2 hover:bg-white/10 rounded-full">
+                  {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+                </button>
+              </div>
+
+            </div>
+          </header>
+
+          {/* DYNAMIC SCROLLING CATEGORY HEADER BAR */}
+          <nav className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700 overflow-x-auto scrollbar-none">
+            <div className="max-w-7xl mx-auto flex items-center space-x-8 px-4 py-3 justify-start md:justify-center whitespace-nowrap">
+              <button
+                onClick={() => { setSelectedCategory('all'); setActiveRoute('/customer/home'); }}
+                className={`flex flex-col items-center gap-1 group focus:outline-none ${selectedCategory === 'all' ? 'text-blue-600 dark:text-blue-400 scale-105' : 'text-slate-600 dark:text-slate-300 hover:text-blue-500'}`}
+              >
+                <span className="text-xl group-hover:scale-110 transition-transform">🛍️</span>
+                <span className="text-[11px] font-extrabold uppercase tracking-tight">All Offers</span>
+              </button>
+              {INITIAL_CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    setSelectedCategory(cat.id);
+                    setActiveRoute('/customer/home');
+                  }}
+                  className={`flex flex-col items-center gap-1 group focus:outline-none ${selectedCategory === cat.id ? 'text-blue-600 dark:text-blue-400 scale-105' : 'text-slate-600 dark:text-slate-300 hover:text-blue-500'}`}
+                >
+                  <span className="text-xl group-hover:scale-110 transition-transform">{cat.icon}</span>
+                  <span className="text-[11px] font-extrabold uppercase tracking-tight">{cat.name}</span>
+                </button>
+              ))}
+            </div>
+          </nav>
+
+          {/* CUSTOMER MAIN ROUTE MANAGER */}
+          <main className="max-w-7xl mx-auto px-4 py-6">
+
+            {/* PAGE 1A: CUSTOMER HOME */}
+            {activeRoute === '/customer/home' && (
+              <div className="space-y-8 animate-fade-in">
+
+                {/* ADVERTISING HERO AUTOPLAY BANNER */}
+                <div className={`relative rounded-lg overflow-hidden shadow-xl bg-gradient-to-br ${BANNERS[bannerIdx].bg} text-white min-h-[200px] md:min-h-[280px] flex items-center p-8 md:p-12 transition-all duration-700`}>
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-0"></div>
+                  
+                  <div className="relative z-10 max-w-lg space-y-3">
+                    <span className="bg-yellow-400 text-slate-950 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
+                      BUYZONE PRIME BONANZA
+                    </span>
+                    <h2 className="text-3xl md:text-4xl font-extrabold leading-tight">
+                      {BANNERS[bannerIdx].title}
+                    </h2>
+                    <p className="text-xs md:text-sm text-slate-200">
+                      {BANNERS[bannerIdx].desc}
+                    </p>
+                    <button 
+                      onClick={() => {
+                        setSelectedCategory('electronics');
+                        triggerToast('⚡ Browsing newly approved digital workstations catalog!', 'info');
+                      }} 
+                      className="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold uppercase py-2.5 px-6 rounded-sm tracking-wider shadow hover:scale-105 transition-all flex items-center gap-2 w-fit"
+                    >
+                      Shop Exclusive Catalog <ArrowRight size={14} />
+                    </button>
+                  </div>
+
+                  {/* Manual Carousel controls */}
+                  <div className="absolute right-4 bottom-4 flex gap-2">
+                    {BANNERS.map((_, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={() => setBannerIdx(idx)}
+                        className={`h-2.5 w-2.5 rounded-full ${idx === bannerIdx ? 'bg-white' : 'bg-white/40'}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* CATALOG & GRID BLOCK */}
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                  
+                  {/* LEFT COLUMN: ADVANCED FILTERS & AI SHOPPING */}
+                  <div className="space-y-6">
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 space-y-6">
+                      <div className="flex justify-between items-center border-b pb-3 dark:border-slate-700">
+                        <h4 className="font-bold text-sm uppercase flex items-center gap-2">
+                          <Filter size={16} className="text-blue-500" /> Filters
+                        </h4>
+                        <button 
+                          onClick={() => { setSearchQuery(''); setPriceFilter(100000); setSortBy('popular'); }} 
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+                        >
+                          Clear All
+                        </button>
+                      </div>
+
+                      {/* Price parameters */}
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">MAX PRICE: ₹{priceFilter.toLocaleString()}</label>
+                        <input 
+                          type="range" 
+                          min="1000" 
+                          max="100000" 
+                          step="1000"
+                          value={priceFilter}
+                          onChange={(e) => setPriceFilter(Number(e.target.value))}
+                          className="w-full accent-blue-600"
+                        />
+                        <div className="flex justify-between text-[10px] text-slate-400">
+                          <span>₹1,000</span>
+                          <span>₹1,00,000+</span>
+                        </div>
+                      </div>
+
+                      {/* Sorting Selection */}
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">SORT BY</label>
+                        <select 
+                          value={sortBy} 
+                          onChange={(e) => setSortBy(e.target.value)}
+                          className="w-full bg-slate-50 dark:bg-slate-700 border dark:border-slate-600 rounded p-2 text-xs focus:ring-1 focus:ring-blue-500 outline-none"
+                        >
+                          <option value="popular">Popularity / Relevance</option>
+                          <option value="low-to-high">Price: Low to High</option>
+                          <option value="high-to-low">Price: High to Low</option>
+                          <option value="rating">Highest Rated</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* AI PERSONAL SHOOPER REC CARD */}
+                    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 p-5 rounded-lg border border-blue-100 dark:border-slate-700 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🤖</span>
+                        <span className="text-xs font-black text-indigo-800 dark:text-indigo-300 uppercase tracking-wider">AI Personal Shopper</span>
+                      </div>
+                      <p className="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+                        Based on your interest in <span className="font-bold text-blue-700 dark:text-blue-400">pro laptops</span>, our recommendation model highly matches the Horizon Pro 5G Mobile for cross-device connectivity.
+                      </p>
+                      <button 
+                        onClick={() => { setSelectedProductId('p2'); setActiveRoute('/customer/product-detail'); }}
+                        className="text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline"
+                      >
+                        Examine SmartPhone recommendation <ArrowRight size={12} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* RIGHT COLUMN: LISTINGS GRID */}
+                  <div className="lg:col-span-3 space-y-6">
+                    <div className="flex justify-between items-center bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border dark:border-slate-700">
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                        Showing {catalogProducts.length} Premium items
+                      </span>
+                      <div className="flex gap-1.5">
+                        <span className="text-[10px] bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded uppercase self-center">
+                          Active Sellers Online
+                        </span>
+                      </div>
+                    </div>
+
+                    {catalogProducts.length === 0 ? (
+                      <div className="bg-white dark:bg-slate-800 rounded-lg p-16 text-center shadow border dark:border-slate-700">
+                        <span className="text-5xl">🔍</span>
+                        <h4 className="mt-4 font-bold text-lg">No products found</h4>
+                        <p className="text-xs text-slate-400 max-w-sm mx-auto mt-2">
+                          Try expanding your price range slider or clearing the search query to show all multi-vendor items.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {catalogProducts.map(p => {
+                          const savings = Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100);
+                          return (
+                            <div 
+                              key={p.id}
+                              className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-200 flex flex-col group"
+                            >
+                              {/* Product Banner Image */}
+                              <div className="relative bg-slate-50 dark:bg-slate-900 h-44 flex items-center justify-center p-3 cursor-pointer" onClick={() => { setSelectedProductId(p.id); setActiveRoute('/customer/product-detail'); }}>
+                                <img src={p.images[0]} alt={p.name} className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform" />
+                                {p.featured && (
+                                  <span className="absolute top-2 left-2 bg-blue-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-tight shadow">
+                                    TRENDING
+                                  </span>
+                                )}
+                                <span className="absolute top-2 right-2 bg-yellow-400 text-slate-900 text-[10px] font-black px-2 py-0.5 rounded shadow">
+                                  {savings}% OFF
+                                </span>
+                              </div>
+
+                              {/* Details Block */}
+                              <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
+                                <div className="space-y-1.5 cursor-pointer" onClick={() => { setSelectedProductId(p.id); setActiveRoute('/customer/product-detail'); }}>
+                                  <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase">{p.category}</span>
+                                  <h4 className="font-bold text-sm text-slate-800 dark:text-white line-clamp-2 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                    {p.name}
+                                  </h4>
+                                  
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                      {p.rating} <Star size={10} className="fill-white" />
+                                    </span>
+                                    <span className="text-[11px] text-slate-400 font-medium">({p.reviews?.length || 0} reviews)</span>
+                                  </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                  <div className="flex items-baseline gap-2">
+                                    <span className="text-lg font-black text-slate-900 dark:text-white">₹{p.price.toLocaleString()}</span>
+                                    <span className="text-xs text-slate-400 line-through">₹{p.originalPrice.toLocaleString()}</span>
+                                  </div>
+
+                                  <div className="grid grid-cols-2 gap-2 pt-2 border-t dark:border-slate-700 text-xs font-bold">
+                                    <button 
+                                      onClick={() => {
+                                        if (wishlist.includes(p.id)) {
+                                          setWishlist(wishlist.filter(id => id !== p.id));
+                                          triggerToast('❤️ Removed from wishlist', 'info');
+                                        } else {
+                                          setWishlist([...wishlist, p.id]);
+                                          triggerToast('❤️ Added to wishlist', 'success');
+                                        }
+                                      }}
+                                      className={`border py-1.5 rounded-sm flex items-center justify-center gap-1.5 ${wishlist.includes(p.id) ? 'bg-red-50 dark:bg-red-950/20 text-red-500 border-red-200' : 'hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+                                    >
+                                      <Heart size={14} className={wishlist.includes(p.id) ? 'fill-current' : ''} />
+                                      {wishlist.includes(p.id) ? 'Liked' : 'Save'}
+                                    </button>
+                                    <button 
+                                      onClick={() => handleAddToCart(p)}
+                                      className="bg-blue-600 hover:bg-blue-500 text-white py-1.5 rounded-sm flex items-center justify-center gap-1.5 shadow"
+                                    >
+                                      <ShoppingCart size={14} /> Add
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+
+                {/* RECENTLY VIEWED PRODUCTS DISPLAY */}
+                <div className="bg-slate-100 dark:bg-slate-900 rounded-lg p-5 border dark:border-slate-800">
+                  <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 flex items-center gap-2">
+                    <Compass size={16} className="text-amber-500" /> Recently Viewed Catalog Items
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {recentlyViewed.map(rid => {
+                      const item = products.find(p => p.id === rid);
+                      if (!item) return null;
+                      return (
+                        <div 
+                          key={item.id}
+                          onClick={() => { setSelectedProductId(item.id); setActiveRoute('/customer/product-detail'); }}
+                          className="bg-white dark:bg-slate-800 p-3 rounded border dark:border-slate-700 flex items-center gap-3 cursor-pointer hover:shadow transition-shadow"
+                        >
+                          <img src={item.images[0]} alt={item.name} className="w-10 h-10 object-contain" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold truncate">{item.name}</p>
+                            <p className="text-xs font-black text-blue-600 dark:text-blue-400">₹{item.price.toLocaleString()}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+            {/* PAGE 1B: CUSTOMER PRODUCT DETAIL */}
+            {activeRoute === '/customer/product-detail' && (
+              <div className="space-y-6 animate-fade-in">
+                
+                {/* Back Link row */}
+                <div className="flex justify-between items-center text-xs">
+                  <button onClick={() => setActiveRoute('/customer/home')} className="text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1">
+                    <ChevronLeft size={16} /> Return to catalog
+                  </button>
+                  <span className="text-slate-400">Home &gt; {activeProduct.category.toUpperCase()} &gt; SKU: {activeProduct.sku}</span>
+                </div>
+
+                {/* Core configuration block */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white dark:bg-slate-800 p-6 md:p-8 rounded-lg border dark:border-slate-700 shadow-sm">
+                  
+                  {/* Left Column: Image Slider */}
+                  <div className="space-y-4">
+                    <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-8 h-80 md:h-96 flex items-center justify-center border dark:border-slate-700 relative group overflow-hidden">
+                      <img src={activeProduct.images[0]} alt={activeProduct.name} className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300" />
+                      <span className="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur text-white text-[9px] px-2 py-1 rounded">
+                        🔍 Hover over image to zoom details
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <button 
+                        onClick={() => handleAddToCart(activeProduct)}
+                        className="bg-yellow-500 hover:bg-yellow-400 text-slate-950 py-3 rounded-sm font-black text-xs uppercase tracking-wide flex items-center justify-center gap-2 shadow"
+                      >
+                        <ShoppingCart size={18} /> Add to Cart
+                      </button>
+                      <button 
+                        onClick={() => {
+                          handleAddToCart(activeProduct, true);
+                          setActiveRoute('/customer/cart');
+                        }}
+                        className="bg-[#FF6B35] hover:bg-[#ff5d24] text-white py-3 rounded-sm font-black text-xs uppercase tracking-wide flex items-center justify-center gap-2 shadow"
+                      >
+                        ⚡ Instant Buy Now
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Specification details */}
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <span className="bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300 text-[10px] font-black uppercase px-2.5 py-1 rounded">
+                        {activeProduct.category}
+                      </span>
+                      <h1 className="text-xl md:text-2xl font-bold leading-tight">
+                        {activeProduct.name}
+                      </h1>
+                      
+                      <div className="flex items-center gap-3">
+                        <span className="bg-emerald-600 text-white text-[11px] font-black px-2 py-0.5 rounded flex items-center gap-0.5">
+                          {activeProduct.rating} <Star size={12} className="fill-white" />
+                        </span>
+                        <span className="text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline cursor-pointer">
+                          {activeProduct.reviews?.length || 0} Verified Buyer Ratings
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Price structure */}
+                    <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border dark:border-slate-700">
+                      <div className="flex items-baseline gap-3">
+                        <span className="text-3xl font-black text-slate-900 dark:text-white">₹{activeProduct.price.toLocaleString()}</span>
+                        <span className="text-sm line-through text-slate-400">₹{activeProduct.originalPrice.toLocaleString()}</span>
+                        <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase bg-emerald-100 dark:bg-emerald-950/40 px-2 py-1 rounded">
+                          {Math.round(((activeProduct.originalPrice - activeProduct.price) / activeProduct.originalPrice) * 100)}% Discount
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 mt-1.5 font-bold uppercase">
+                        IGST calculated automatically at standard rates during checkout.
+                      </p>
+                    </div>
+
+                    {/* Seller details */}
+                    <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 flex justify-between items-center text-xs">
+                      <div>
+                        <p className="text-slate-400 font-bold uppercase text-[9px]">Marketplace Dispatch Partner</p>
+                        <p className="font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">{activeProduct.seller}</p>
+                      </div>
+                      <span className="bg-emerald-100 text-emerald-800 font-black px-2 py-1 rounded text-[9px] uppercase">
+                        Verified Vendor
+                      </span>
+                    </div>
+
+                    {/* Tabs system */}
+                    <div className="space-y-4">
+                      <div className="flex border-b dark:border-slate-700">
+                        {['description', 'specifications', 'reviews'].map(tab => (
+                          <button
+                            key={tab}
+                            onClick={() => setActiveProductTab(tab)}
+                            className={`px-4 py-2 text-xs font-black uppercase tracking-wider border-b-2 transition-all ${activeProductTab === tab ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                          >
+                            {tab}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                        {activeProductTab === 'description' && (
+                          <p>{activeProduct.description}</p>
+                        )}
+                        {activeProductTab === 'specifications' && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {Object.entries(activeProduct.specs || {}).map(([key, val]) => (
+                              <div key={key} className="bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 flex justify-between">
+                                <span className="font-bold text-slate-400">{key}</span>
+                                <span className="font-extrabold text-right">{val}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {activeProductTab === 'reviews' && (
+                          <div className="space-y-4">
+                            {activeProduct.reviews?.length === 0 ? (
+                              <p className="text-slate-400">No buyer reviews cataloged for this product yet. Write the first review below!</p>
+                            ) : (
+                              activeProduct.reviews.map(rev => (
+                                <div key={rev.id} className="border-b dark:border-slate-700 pb-3">
+                                  <div className="flex justify-between items-center">
+                                    <span className="font-bold">{rev.author}</span>
+                                    <span className="text-[10px] text-slate-400">{rev.date}</span>
+                                  </div>
+                                  <div className="flex gap-0.5 text-amber-500 my-1">
+                                    {[...Array(rev.rating)].map((_, i) => <Star key={i} size={10} className="fill-current" />)}
+                                  </div>
+                                  <p className="text-slate-500 dark:text-slate-400">{rev.text}</p>
+                                </div>
+                              ))
+                            )}
+
+                            {/* Create Custom review */}
+                            <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded border dark:border-slate-700 space-y-3 mt-4">
+                              <h5 className="font-bold text-[10px] uppercase text-slate-500">Add custom verified buyer review</h5>
+                              <div className="flex gap-4">
+                                <select 
+                                  value={custReviewRating} 
+                                  onChange={(e) => setCustReviewRating(Number(e.target.value))}
+                                  className="bg-white dark:bg-slate-800 p-2 rounded text-xs border dark:border-slate-700 focus:outline-none"
+                                >
+                                  <option value="5">5 Stars</option>
+                                  <option value="4">4 Stars</option>
+                                  <option value="3">3 Stars</option>
+                                  <option value="2">2 Stars</option>
+                                  <option value="1">1 Star</option>
+                                </select>
+                                <input 
+                                  type="text" 
+                                  value={custReviewText}
+                                  onChange={(e) => setCustReviewText(e.target.value)}
+                                  placeholder="Write a custom review about performance, delivery..."
+                                  className="flex-1 bg-white dark:bg-slate-800 p-2 rounded text-xs border dark:border-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                />
+                                <button 
+                                  onClick={() => {
+                                    if (!custReviewText.trim()) return;
+                                    const newRev = {
+                                      id: `rev-${Date.now()}`,
+                                      author: customerUser.name,
+                                      rating: custReviewRating,
+                                      text: custReviewText,
+                                      date: new Date().toISOString().split('T')[0]
+                                    };
+                                    activeProduct.reviews = [...(activeProduct.reviews || []), newRev];
+                                    // recalculate average rating
+                                    const totalRate = activeProduct.reviews.reduce((acc, r) => acc + r.rating, 0);
+                                    activeProduct.rating = parseFloat((totalRate / activeProduct.reviews.length).toFixed(1));
+
+                                    triggerToast('🌟 Review published successfully!', 'success');
+                                    setCustReviewText('');
+                                  }}
+                                  className="bg-blue-600 text-white font-bold px-4 rounded text-xs hover:bg-blue-500"
+                                >
+                                  Publish
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+            )}
+
+            {/* PAGE 1C: CUSTOMER SHOPPING CART */}
+            {activeRoute === '/customer/cart' && (
+              <div className="space-y-6 animate-fade-in">
+                <h3 className="text-xl font-bold tracking-tight uppercase border-l-4 border-blue-600 pl-3">
+                  Marketplace Shopping Cart ({cart.length} Items Selected)
+                </h3>
+
+                {cart.length === 0 ? (
+                  <div className="bg-white dark:bg-slate-800 rounded-lg p-16 text-center border dark:border-slate-700 space-y-4">
+                    <span className="text-5xl">🛒</span>
+                    <h4 className="font-bold text-lg text-slate-400">Your cart is currently empty</h4>
+                    <p className="text-xs text-slate-500">Discover premium deals and add high-performance items to checkout.</p>
+                    <button 
+                      onClick={() => setActiveRoute('/customer/home')}
+                      className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2 rounded text-xs uppercase"
+                    >
+                      Shop Catalog
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    {/* Cart Items List */}
+                    <div className="lg:col-span-2 space-y-4">
+                      {cart.map(item => (
+                        <div key={item.product.id} className="bg-white dark:bg-slate-800 p-5 rounded-lg border dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+                          <div className="flex items-center gap-4">
+                            <img src={item.product.images[0]} alt={item.product.name} className="w-16 h-16 object-contain bg-slate-50 rounded" />
+                            <div>
+                              <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase">{item.product.category}</p>
+                              <h4 className="font-bold text-sm line-clamp-1 text-slate-800 dark:text-white">{item.product.name}</h4>
+                              <p className="text-xs text-slate-400">Seller: {item.product.seller}</p>
+                              <p className="text-sm font-black text-slate-900 dark:text-white mt-1">₹{item.product.price.toLocaleString()}</p>
+                            </div>
+                          </div>
+
+                          {/* Qty Adjustment Controls */}
+                          <div className="flex items-center gap-4 justify-between w-full sm:w-auto">
+                            <div className="flex items-center border dark:border-slate-600 rounded">
+                              <button onClick={() => handleUpdateCartQty(item.product.id, -1)} className="px-3 py-1 text-slate-500 hover:bg-slate-100 font-bold">-</button>
+                              <span className="px-3 py-1 text-xs font-black">{item.quantity}</span>
+                              <button onClick={() => handleUpdateCartQty(item.product.id, 1)} className="px-3 py-1 text-slate-500 hover:bg-slate-100 font-bold">+</button>
+                            </div>
+
+                            <button 
+                              onClick={() => {
+                                setCart(cart.filter(c => c.product.id !== item.product.id));
+                                triggerToast('🗑️ Item removed from shopping cart', 'info');
+                              }} 
+                              className="text-slate-400 hover:text-red-500 p-2"
+                            >
+                              <Trash size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Order summary */}
+                    <div className="space-y-6">
+                      <div className="bg-white dark:bg-slate-800 p-5 rounded-lg border dark:border-slate-700 shadow-sm space-y-6">
+                        <h4 className="font-bold text-sm uppercase border-b pb-3 dark:border-slate-700">Order Pricing Summary</h4>
+                        
+                        {/* Promo application block */}
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-slate-500 block">Promotional Coupons</label>
+                          <div className="flex gap-2">
+                            <input 
+                              type="text" 
+                              value={enteredCoupon}
+                              onChange={(e) => setEnteredCoupon(e.target.value)}
+                              placeholder="e.g. FESTIVE20"
+                              className="bg-slate-50 dark:bg-slate-700 p-2 text-xs border dark:border-slate-600 rounded flex-1 uppercase focus:outline-none"
+                            />
+                            <button onClick={handleApplyCoupon} className="bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 text-white px-4 text-xs font-bold rounded">
+                              Apply
+                            </button>
+                          </div>
+                          {appliedCoupon && (
+                            <div className="bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 p-2 rounded text-[11px] font-bold flex justify-between items-center mt-2 border border-emerald-100">
+                              <span>Applied: {appliedCoupon.code}</span>
+                              <button onClick={() => setAppliedCoupon(null)} className="hover:text-red-500"><X size={12} /></button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Calculated fields */}
+                        <div className="space-y-2 text-xs border-b pb-4 dark:border-slate-700">
+                          <div className="flex justify-between text-slate-500">
+                            <span>Subtotal Items</span>
+                            <span>₹{cartTotals.subtotal.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between text-slate-500">
+                            <span>Standard IGST (18%)</span>
+                            <span>₹{cartTotals.gstTax.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between text-slate-500">
+                            <span>Shipping Logistics Fee</span>
+                            <span>{cartTotals.shipping === 0 ? <span className="text-emerald-500 font-bold">FREE</span> : `₹${cartTotals.shipping}`}</span>
+                          </div>
+                          {appliedCoupon && (
+                            <div className="flex justify-between text-emerald-600 font-bold">
+                              <span>Coupon discount</span>
+                              <span>-₹{cartTotals.discount.toLocaleString()}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-bold uppercase">Total Bill Amount</span>
+                          <span className="text-2xl font-black text-blue-600 dark:text-blue-400">₹{cartTotals.total.toLocaleString()}</span>
+                        </div>
+
+                        <button 
+                          onClick={() => setActiveRoute('/customer/checkout')}
+                          className="w-full bg-[#FFC220] hover:bg-yellow-400 text-slate-900 py-3 rounded font-black text-xs uppercase tracking-wider text-center block shadow"
+                        >
+                          Proceed to Payment Setup
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* PAGE 1D: CUSTOMER CHECKOUT PAGE */}
+            {activeRoute === '/customer/checkout' && (
+              <div className="space-y-6 animate-fade-in">
+                <h3 className="text-xl font-bold tracking-tight uppercase border-l-4 border-blue-600 pl-3">
+                  Logistics & Payment Gateway Setup
+                </h3>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  
+                  {/* Left block form */}
+                  <div className="lg:col-span-2 space-y-6">
+                    
+                    {/* Delivery address select */}
+                    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm space-y-4">
+                      <h4 className="font-bold text-sm uppercase border-b pb-2 dark:border-slate-700">1. Confirm Delivery Logistics Address</h4>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {customerUser.addresses.map(addr => (
+                          <div 
+                            key={addr.id}
+                            onClick={() => setActiveAddressId(addr.id)}
+                            className={`p-4 rounded border-2 cursor-pointer transition-all ${activeAddressId === addr.id ? 'border-blue-600 bg-blue-50/10' : 'border-slate-200 dark:border-slate-700'}`}
+                          >
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400">{addr.tag}</span>
+                              {activeAddressId === addr.id && <span className="bg-blue-600 text-white rounded-full p-0.5"><Check size={10} /></span>}
+                            </div>
+                            <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">{addr.detail}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <button 
+                        onClick={() => {
+                          const det = prompt("Enter new complete shipping address detail:");
+                          if (det) {
+                            setCustomerUser(prev => ({
+                              ...prev,
+                              addresses: [...prev.addresses, { id: `addr-${Date.now()}`, tag: 'Alternative', detail: det }]
+                            }));
+                            triggerToast('📍 Added alternative shipping address', 'success');
+                          }
+                        }}
+                        className="text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline"
+                      >
+                        + Add Custom Alternate Delivery Address
+                      </button>
+                    </div>
+
+                    {/* Payment systems selection */}
+                    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm space-y-4">
+                      <h4 className="font-bold text-sm uppercase border-b pb-2 dark:border-slate-700">2. Select Secure Payment Gateway</h4>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-bold">
+                        {['UPI', 'Credit Card', 'Net Banking', 'Cash On Delivery'].map(method => (
+                          <button 
+                            key={method}
+                            onClick={() => setCheckoutPaymentMethod(method)}
+                            className={`p-3 rounded border text-center transition-all ${checkoutPaymentMethod === method ? 'bg-slate-900 dark:bg-blue-600 text-white border-transparent shadow' : 'bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600'}`}
+                          >
+                            {method}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Summary pay confirmation */}
+                  <div className="space-y-6">
+                    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm space-y-4">
+                      <h4 className="font-bold text-sm uppercase border-b pb-2 dark:border-slate-700">Order Authorisation</h4>
+                      
+                      <div className="space-y-2 text-xs">
+                        <div className="flex justify-between text-slate-500">
+                          <span>Total Cart Charge</span>
+                          <span>₹{cartTotals.total.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-slate-500">
+                          <span>Loyalty points accrued (5%)</span>
+                          <span className="text-emerald-500 font-bold">+{Math.round(cartTotals.total * 0.05)} Points</span>
+                        </div>
+                      </div>
+
+                      <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded text-xs space-y-1">
+                        <span className="font-bold text-[10px] text-slate-400 uppercase">Shipping Destination:</span>
+                        <p className="font-extrabold truncate">
+                          {customerUser.addresses.find(a => a.id === activeAddressId)?.detail}
+                        </p>
+                      </div>
+
+                      <button 
+                        onClick={handleCheckout}
+                        className="w-full bg-[#FF6B35] hover:bg-[#ff5d24] text-white py-3 rounded font-black text-xs uppercase tracking-wider shadow"
+                      >
+                        Authorize & Place Order
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            )}
+
+            {/* PAGE 1E: CUSTOMER ORDERS VIEW */}
+            {activeRoute === '/customer/orders' && (
+              <div className="space-y-6 animate-fade-in">
+                <h3 className="text-xl font-bold tracking-tight uppercase border-l-4 border-blue-600 pl-3">
+                  Visual Order Tracking System
+                </h3>
+
+                {orders.length === 0 ? (
+                  <div className="p-8 text-center text-slate-400">No active tracking references found.</div>
+                ) : (
+                  <div className="space-y-6">
+                    {orders.map(order => {
+                      const stages = ['Ordered', 'Packed', 'Shipped', 'Delivered'];
+                      const currentStageIdx = stages.indexOf(order.status);
+                      return (
+                        <div key={order.id} className="bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm space-y-6">
+                          
+                          {/* Order Header */}
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 dark:border-slate-700 gap-2 text-xs">
+                            <div>
+                              <span className="bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300 font-black px-2.5 py-1 rounded">
+                                ORDER REF: #{order.id}
+                              </span>
+                              <p className="text-slate-400 mt-2 font-semibold">Placed on: {order.date} via {order.paymentMethod}</p>
+                            </div>
+                            <div className="sm:text-right">
+                              <span className="text-[10px] text-slate-400 uppercase font-bold">Total Bill:</span>
+                              <p className="text-lg font-black text-blue-600 dark:text-blue-400">₹{order.total.toLocaleString()}</p>
+                            </div>
+                          </div>
+
+                          {/* Items listed */}
+                          <div className="space-y-1 text-xs">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase">Consignment details:</span>
+                            {order.items.map(i => (
+                              <div key={i.id} className="flex justify-between font-bold">
+                                <span>{i.name} (Qty x{i.quantity})</span>
+                                <span>₹{(i.price * i.quantity).toLocaleString()}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Visual Timeline progress tracker */}
+                          <div className="pt-8 pb-4">
+                            <div className="relative">
+                              <div className="absolute top-1/2 left-0 right-0 h-1 bg-slate-200 dark:bg-slate-700 -translate-y-1/2 rounded-full"></div>
+                              <div 
+                                className="absolute top-1/2 left-0 h-1 bg-emerald-600 dark:bg-emerald-400 -translate-y-1/2 rounded-full transition-all duration-500"
+                                style={{ width: `${(currentStageIdx / (stages.length - 1)) * 100}%` }}
+                              ></div>
+
+                              {/* Stage nodes */}
+                              <div className="relative flex justify-between">
+                                {stages.map((stage, sIdx) => {
+                                  const completed = sIdx <= currentStageIdx;
+                                  return (
+                                    <div key={stage} className="flex flex-col items-center bg-white dark:bg-slate-800 px-1">
+                                      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black transition-all ${completed ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-200 text-slate-500 dark:bg-slate-700'}`}>
+                                        {completed ? <Check size={14} /> : sIdx + 1}
+                                      </div>
+                                      <span className={`text-[10px] font-bold uppercase tracking-tight mt-1.5 ${completed ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`}>
+                                        {stage}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded text-xs space-y-1 border dark:border-slate-700">
+                            <span className="font-bold text-[10px] text-slate-400 uppercase">Estimated Shipping Destination:</span>
+                            <p className="font-extrabold">{order.shippingAddress}</p>
+                          </div>
+
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* PAGE 1F: CUSTOMER ACCOUNT DASHBOARD */}
+            {activeRoute === '/customer/dashboard' && (
+              <div className="space-y-6 animate-fade-in">
+                <h3 className="text-xl font-bold tracking-tight uppercase border-l-4 border-blue-600 pl-3">
+                  Account Control Center
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  
+                  {/* Stats sidebar */}
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm space-y-6 text-center">
+                    <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-2xl mx-auto">
+                      {customerUser.name.charAt(0)}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-sm">{customerUser.name}</h4>
+                      <p className="text-xs text-slate-400">{customerUser.email}</p>
+                    </div>
+
+                    <div className="divide-y dark:divide-slate-700 text-xs text-left pt-2">
+                      <div className="py-2.5 flex justify-between">
+                        <span className="text-slate-400">Reward Balance</span>
+                        <span className="font-bold text-emerald-600">{customerUser.points} Points</span>
+                      </div>
+                      <div className="py-2.5 flex justify-between">
+                        <span className="text-slate-400">Mobile Verified</span>
+                        <span className="font-extrabold text-blue-600">{customerUser.mobile}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Orders history list tab */}
+                  <div className="md:col-span-3 space-y-6">
+                    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm space-y-4">
+                      <h4 className="font-bold text-sm uppercase border-b pb-2 dark:border-slate-700">Consolidated Purchase History</h4>
+                      
+                      {orders.length === 0 ? (
+                        <p className="text-xs text-slate-400 py-4">No purchases tracked under this profile yet.</p>
+                      ) : (
+                        <div className="space-y-3 text-xs">
+                          {orders.map(or => (
+                            <div key={or.id} className="p-4 rounded bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 flex justify-between items-center">
+                              <div>
+                                <span className="font-bold">Order Ref: #{or.id}</span>
+                                <p className="text-slate-400 mt-1">Placed: {or.date} | Cost: ₹{or.total.toLocaleString()}</p>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span className="bg-blue-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded">
+                                  {or.status}
+                                </span>
+                                <button onClick={() => setActiveRoute('/customer/orders')} className="text-blue-600 font-bold hover:underline">
+                                  Track Live
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            )}
+
+          </main>
+        </div>
+      )}
+
+      {/* ======================================= */}
+      {/* 2. SELLER PORTAL PAGES                 */}
+      {/* ======================================= */}
+      {activeRoute.startsWith('/seller') && (
+        <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fade-in">
+          
+          {/* SELLER HEADER STATUS */}
+          <div className="bg-gradient-to-r from-emerald-600 to-teal-800 text-white p-6 rounded-lg shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h2 className="text-2xl font-black uppercase tracking-tight">Merchant Control Office</h2>
+              <p className="text-xs text-emerald-100 mt-1">Submit digital compliance documents, catalog logistics inventory, and process verified consumer consignments.</p>
+            </div>
+            
+            {sellerUser && (
+              <div className="bg-emerald-900/60 border border-emerald-500/30 p-2.5 rounded text-xs">
+                <p className="font-bold uppercase text-[9px] text-emerald-300">Authorized Merchant Session:</p>
+                <p className="font-black mt-0.5">{sellerUser.name}</p>
+              </div>
+            )}
+          </div>
+
+          {/* SELLER ROUTING */}
+          
+          {/* SELLER LOGIN */}
+          {activeRoute === '/seller/login' && (
+            <div className="max-w-md mx-auto bg-white dark:bg-slate-800 p-8 rounded-lg shadow-md border dark:border-slate-700 space-y-6">
+              <div className="text-center space-y-2">
+                <span className="text-3xl">🏪</span>
+                <h3 className="text-lg font-bold uppercase tracking-wide">Log In to Seller Office</h3>
+                <p className="text-xs text-slate-400">Credentials created during compliance onboarding.</p>
+              </div>
+
+              {/* Guide warning for mock validation flow */}
+              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded border dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
+                <p className="font-bold flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
+                  <ShieldCheck size={16} /> Sandbox Access Guide:
+                </p>
+                <p>
+                  Only <span className="font-bold">Approved</span> sellers can gain access. Go to the <span className="font-bold text-rose-600">Admin Desk</span> to verify pending submissions first!
+                </p>
+                <div className="pt-2 border-t dark:border-slate-700">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Pre-approved credentials:</p>
+                  <p className="font-mono mt-0.5">raman@zonetech.in</p>
+                </div>
+              </div>
+
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const mail = e.target.email.value.trim();
+                const match = sellers.find(s => s.email === mail);
+                if (!match) {
+                  triggerToast('❌ Vendor email not registered or incorrect.', 'error');
+                  return;
+                }
+                if (match.status !== 'Approved') {
+                  triggerToast(`❌ Access denied. Verification Application Status: ${match.status.toUpperCase()}`, 'error');
+                  return;
+                }
+                setSellerUser(match);
+                triggerToast(`🔓 Onboarding Authorized! Welcome back, ${match.owner}.`, 'success');
+                setActiveRoute('/seller/dashboard');
+              }} className="space-y-4 text-xs">
+                <div>
+                  <label className="block text-slate-400 uppercase mb-1 font-bold">Business Email Address</label>
+                  <input 
+                    name="email"
+                    type="email" 
+                    required
+                    placeholder="raman@zonetech.in"
+                    className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 uppercase mb-1 font-bold">Onboarding Password</label>
+                  <input 
+                    type="password" 
+                    defaultValue="••••••••"
+                    required
+                    className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none"
+                  />
+                </div>
+
+                <button 
+                  type="submit"
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3 rounded text-xs uppercase tracking-wider shadow"
+                >
+                  Verify compliance credentials
+                </button>
+              </form>
+
+              <div className="text-center pt-4 border-t dark:border-slate-700">
+                <button 
+                  onClick={() => setActiveRoute('/seller/register')}
+                  className="text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline"
+                >
+                  Create New Merchant Application &gt;
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* SELLER REGISTRATION */}
+          {activeRoute === '/seller/register' && (
+            <div className="max-w-3xl mx-auto bg-white dark:bg-slate-800 p-6 md:p-8 rounded-lg shadow-md border dark:border-slate-700 space-y-6">
+              <div className="border-b pb-4 dark:border-slate-700">
+                <h3 className="text-lg font-bold uppercase">Business Compliance Registration</h3>
+                <p className="text-xs text-slate-400">Submit official documentation to obtain retail catalog dispatch rights.</p>
+              </div>
+
+              <form onSubmit={handleSellerRegister} className="space-y-6 text-xs">
+                
+                {/* Step 1: Corporate Details */}
+                <div className="space-y-4">
+                  <h4 className="font-extrabold uppercase text-emerald-600 tracking-wider">1. Business Profile Details</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-slate-400 uppercase mb-1 font-bold">Shop / Brand Name *</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={regShopName}
+                        onChange={(e) => setRegShopName(e.target.value)}
+                        placeholder="e.g. Apex Electronics Retail"
+                        className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-400 uppercase mb-1 font-bold">Owner Legal Name *</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={regOwnerName}
+                        onChange={(e) => setRegOwnerName(e.target.value)}
+                        placeholder="e.g. Rajesh Kumar"
+                        className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-400 uppercase mb-1 font-bold">Business Email *</label>
+                      <input 
+                        type="email" 
+                        required
+                        value={regEmail}
+                        onChange={(e) => setRegEmail(e.target.value)}
+                        placeholder="rajesh@apexretail.com"
+                        className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-400 uppercase mb-1 font-bold">Mobile Connection Number *</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={regMobile}
+                        onChange={(e) => setRegMobile(e.target.value)}
+                        placeholder="+91 98765 XXXXX"
+                        className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 2: Legal compliance */}
+                <div className="space-y-4 pt-4 border-t dark:border-slate-700">
+                  <h4 className="font-extrabold uppercase text-emerald-600 tracking-wider">2. Central Taxation Compliance (GST & PAN)</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-slate-400 uppercase mb-1 font-bold">GSTIN Registration Number *</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={regGst}
+                        onChange={(e) => setRegGst(e.target.value)}
+                        placeholder="15-digit code (e.g. 27AAAAA1111A1Z1)"
+                        className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none uppercase"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-400 uppercase mb-1 font-bold">Corporate PAN Card *</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={regPan}
+                        onChange={(e) => setRegPan(e.target.value)}
+                        placeholder="e.g. ABCDE1234F"
+                        className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none uppercase"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Mock file uploads */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                    <div className="border border-dashed border-slate-300 dark:border-slate-700 p-4 rounded text-center bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 cursor-pointer">
+                      <Upload size={18} className="mx-auto text-slate-400 mb-1" />
+                      <span className="font-bold block">GST Certificate.pdf</span>
+                    </div>
+                    <div className="border border-dashed border-slate-300 dark:border-slate-700 p-4 rounded text-center bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 cursor-pointer">
+                      <Upload size={18} className="mx-auto text-slate-400 mb-1" />
+                      <span className="font-bold block">PAN Card.jpg</span>
+                    </div>
+                    <div className="border border-dashed border-slate-300 dark:border-slate-700 p-4 rounded text-center bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 cursor-pointer">
+                      <Upload size={18} className="mx-auto text-slate-400 mb-1" />
+                      <span className="font-bold block">Cancelled Cheque.pdf</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 3: Logistics Address */}
+                <div className="space-y-4 pt-4 border-t dark:border-slate-700">
+                  <h4 className="font-extrabold uppercase text-emerald-600 tracking-wider">3. Warehouse Location & Bank Setup</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-slate-400 uppercase mb-1 font-bold">Physical Store Address</label>
+                      <input 
+                        type="text" 
+                        value={regAddress}
+                        onChange={(e) => setRegAddress(e.target.value)}
+                        placeholder="Complete Street Address, City, State, ZIP"
+                        className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-400 uppercase mb-1 font-bold">Bank Account Number</label>
+                      <input 
+                        type="password" 
+                        defaultValue="9999999999"
+                        className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-400 uppercase mb-1 font-bold">Bank IFSC Routing Code</label>
+                      <input 
+                        type="text" 
+                        defaultValue="SBIN0001092"
+                        className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  type="submit"
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold p-3 rounded uppercase tracking-wider text-sm shadow"
+                >
+                  Submit Official Registration Documents
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* SELLER MAIN DASHBOARD */}
+          {sellerUser && (
+            <div className="space-y-8">
+              
+              {/* Tabs system */}
+              <div className="flex border-b dark:border-slate-800">
+                <button 
+                  onClick={() => setActiveRoute('/seller/dashboard')}
+                  className={`px-6 py-3 font-bold uppercase tracking-wider text-xs border-b-2 ${activeRoute === '/seller/dashboard' ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-400'}`}
+                >
+                  📊 Performance Dashboard
+                </button>
+                <button 
+                  onClick={() => setActiveRoute('/seller/products')}
+                  className={`px-6 py-3 font-bold uppercase tracking-wider text-xs border-b-2 ${activeRoute === '/seller/products' ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-400'}`}
+                >
+                  📦 Inventory Logistics
+                </button>
+                <button 
+                  onClick={() => setActiveRoute('/seller/orders')}
+                  className={`px-6 py-3 font-bold uppercase tracking-wider text-xs border-b-2 ${activeRoute === '/seller/orders' ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-400'}`}
+                >
+                  🚚 Orders Dispatch
+                </button>
+                <button 
+                  onClick={() => { setSellerUser(null); setActiveRoute('/seller/login'); }}
+                  className="px-6 py-3 font-bold uppercase text-red-500 hover:bg-red-50 text-xs ml-auto"
+                >
+                  Logout Session
+                </button>
+              </div>
+
+              {/* SELLER VIEW CONDITIONAL */}
+              {activeRoute === '/seller/dashboard' && (
+                <div className="space-y-6">
+                  
+                  {/* Cards overview */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-bold">
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-lg border dark:border-slate-700">
+                      <p className="text-slate-400 uppercase text-[9px]">Platform Gross Revenue</p>
+                      <h4 className="text-2xl font-black text-emerald-600 mt-1">₹{sellerUser.sales.toLocaleString()}</h4>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-lg border dark:border-slate-700">
+                      <p className="text-slate-400 uppercase text-[9px]">Withdrawable Balance</p>
+                      <h4 className="text-2xl font-black text-blue-600 mt-1">₹{sellerUser.walletBalance.toLocaleString()}</h4>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-lg border dark:border-slate-700">
+                      <p className="text-slate-400 uppercase text-[9px]">Listed Products Catalog</p>
+                      <h4 className="text-2xl font-black mt-1">
+                        {products.filter(p => p.sellerId === sellerUser.id).length} Active
+                      </h4>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-lg border dark:border-slate-700">
+                      <p className="text-slate-400 uppercase text-[9px]">Fulfillment Score</p>
+                      <h4 className="text-2xl font-black text-yellow-500 mt-1">98.5%</h4>
+                    </div>
+                  </div>
+
+                  {/* Dynamic Analytic Charts Simulation (SVG generated) */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-lg border dark:border-slate-700 md:col-span-2">
+                      <h4 className="font-bold text-xs uppercase text-slate-500 border-b pb-2 dark:border-slate-700">Sales Volume Analytics</h4>
+                      <div className="h-48 flex items-end justify-between pt-6">
+                        {/* Render simple simulation of revenue bars */}
+                        {[60, 40, 80, 50, 90, 70, 95, 110, 85].map((val, idx) => (
+                          <div key={idx} className="flex flex-col items-center flex-1 group">
+                            <div className="bg-emerald-500 w-6 rounded-t transition-all group-hover:bg-emerald-400" style={{ height: `${val}px` }} />
+                            <span className="text-[9px] text-slate-400 mt-1">M{idx+1}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-lg border dark:border-slate-700">
+                      <h4 className="font-bold text-xs uppercase text-slate-500 border-b pb-2 dark:border-slate-700">Withdrawal Funds</h4>
+                      <div className="space-y-4 pt-4 text-xs">
+                        <p className="text-slate-400">Request instant withdrawal directly into verified bank account setup.</p>
+                        <button 
+                          onClick={() => {
+                            if (sellerUser.walletBalance === 0) {
+                              triggerToast('❌ Wallet balance is zero.', 'error');
+                              return;
+                            }
+                            setSellerUser(prev => ({ ...prev, walletBalance: 0 }));
+                            triggerToast('💸 Withdrawal Request successfully placed to Admin desk! Settling within 24 hours.', 'success');
+                          }}
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold w-full p-2 rounded uppercase text-[10px]"
+                        >
+                          Initiate Settlement
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+
+              {/* SELLER INVENTORY PRODUCTS */}
+              {activeRoute === '/seller/products' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  
+                  {/* Create product form */}
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm h-fit">
+                    <h4 className="font-bold text-sm uppercase border-b pb-2 dark:border-slate-700 flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                      <Plus size={16} /> Catalog New Product
+                    </h4>
+
+                    <form onSubmit={handleAddNewProduct} className="space-y-4 text-xs pt-4">
+                      <div>
+                        <label className="block text-slate-400 uppercase mb-1 font-bold">Product Name *</label>
+                        <input 
+                          type="text" 
+                          required
+                          value={newProdName}
+                          onChange={(e) => setNewProdName(e.target.value)}
+                          placeholder="e.g. Sonic Wireless Buds v2"
+                          className="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-slate-400 uppercase mb-1 font-bold">Category</label>
+                          <select 
+                            value={newProdCategory}
+                            onChange={(e) => setNewProdCategory(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 focus:outline-none"
+                          >
+                            {INITIAL_CATEGORIES.map(c => (
+                              <option key={c.id} value={c.id}>{c.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-slate-400 uppercase mb-1 font-bold">Brand Name</label>
+                          <input 
+                            type="text" 
+                            value={newProdBrand}
+                            onChange={(e) => setNewProdBrand(e.target.value)}
+                            placeholder="Sony"
+                            className="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <label className="block text-slate-400 uppercase mb-1 font-bold">Sell Price *</label>
+                          <input 
+                            type="number" 
+                            required
+                            value={newProdPrice}
+                            onChange={(e) => setNewProdPrice(e.target.value)}
+                            placeholder="1499"
+                            className="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 focus:outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-slate-400 uppercase mb-1 font-bold">List Price</label>
+                          <input 
+                            type="number" 
+                            value={newProdOriginal}
+                            onChange={(e) => setNewProdOriginal(e.target.value)}
+                            placeholder="2999"
+                            className="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 focus:outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-slate-400 uppercase mb-1 font-bold">Stock *</label>
+                          <input 
+                            type="number" 
+                            required
+                            value={newProdStock}
+                            onChange={(e) => setNewProdStock(e.target.value)}
+                            placeholder="25"
+                            className="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Mock drag & drop area */}
+                      <div>
+                        <label className="block text-slate-400 uppercase mb-1 font-bold">Interactive Product Media</label>
+                        <div className="border-2 border-dashed border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 rounded p-4 text-center cursor-pointer transition-colors">
+                          <Upload size={20} className="mx-auto text-emerald-600 mb-1" />
+                          <span className="font-extrabold text-[10px] block uppercase text-slate-400">Drag & Drop Product Images</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-400 uppercase mb-1 font-bold">Specifications (Key:Value per line)</label>
+                        <textarea 
+                          rows="3"
+                          value={newProdSpecs}
+                          onChange={(e) => setNewProdSpecs(e.target.value)}
+                          placeholder="Warranty: 1 Year&#10;Origin: India"
+                          className="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-400 uppercase mb-1 font-bold">Detailed Description</label>
+                        <textarea 
+                          rows="3"
+                          value={newProdDesc}
+                          onChange={(e) => setNewProdDesc(e.target.value)}
+                          placeholder="Provide dynamic bullet points for best conversion rates..."
+                          className="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 focus:outline-none"
+                        />
+                      </div>
+
+                      <button 
+                        type="submit"
+                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold p-2.5 rounded uppercase tracking-wider"
+                      >
+                        Publish Catalog Record
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Inventory lists */}
+                  <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm space-y-4">
+                    <h4 className="font-bold text-sm uppercase border-b pb-2 dark:border-slate-700">Active Listings Catalog</h4>
+                    
+                    <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                      {products.filter(p => p.sellerId === sellerUser.id).map(p => (
+                        <div key={p.id} className="p-4 rounded bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 flex justify-between items-center text-xs">
+                          <div className="flex items-center gap-3">
+                            <img src={p.images[0]} alt={p.name} className="w-10 h-10 object-contain rounded" />
+                            <div>
+                              <h5 className="font-bold text-slate-800 dark:text-white line-clamp-1">{p.name}</h5>
+                              <p className="text-[10px] text-slate-400">SKU: {p.sku} | Price: ₹{p.price.toLocaleString()} | stock: {p.stock}</p>
+                            </div>
+                          </div>
+
+                          <button 
+                            onClick={() => {
+                              setProducts(products.filter(item => item.id !== p.id));
+                              triggerToast('🗑️ Listing deleted from active catalog', 'warning');
+                            }}
+                            className="p-1.5 text-red-500 hover:bg-red-50 rounded"
+                            title="Delete entry"
+                          >
+                            <Trash size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                </div>
+              )}
+
+              {/* SELLER DISPATCH ORDERS */}
+              {activeRoute === '/seller/orders' && (
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm space-y-4">
+                  <h4 className="font-bold text-sm uppercase border-b pb-2 dark:border-slate-700">Verified Consumer Consignments</h4>
+                  
+                  {orders.filter(or => or.items.some(i => i.sellerId === sellerUser.id)).length === 0 ? (
+                    <p className="text-xs text-slate-400 py-4">No consumer orders received yet.</p>
+                  ) : (
+                    <div className="space-y-4 text-xs">
+                      {orders.filter(or => or.items.some(i => i.sellerId === sellerUser.id)).map(or => (
+                        <div key={or.id} className="p-4 rounded bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 flex flex-col md:flex-row justify-between gap-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold">Order ID: #{or.id}</span>
+                              <span className="bg-blue-100 text-blue-800 font-extrabold px-2 py-0.5 rounded text-[9px]">
+                                {or.status.toUpperCase()}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-slate-400">Date: {or.date} | Address: {or.shippingAddress}</p>
+                            <div className="font-bold">
+                              {or.items.filter(i => i.sellerId === sellerUser.id).map(item => (
+                                <div key={item.id}>• {item.name} (Qty x{item.quantity})</div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Order State Dispatch updates */}
+                          <div className="flex items-center gap-2 self-end md:self-center">
+                            {or.status === 'Ordered' && (
+                              <button 
+                                onClick={() => {
+                                  setOrders(orders.map(o => o.id === or.id ? { ...o, status: 'Packed' } : o));
+                                  triggerToast(`📦 Consignment #${or.id} updated: Packed & Ready`, 'success');
+                                }}
+                                className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded font-black text-[10px] uppercase tracking-wider"
+                              >
+                                Pack Consignment
+                              </button>
+                            )}
+                            {or.status === 'Packed' && (
+                              <button 
+                                onClick={() => {
+                                  setOrders(orders.map(o => o.id === or.id ? { ...o, status: 'Shipped' } : o));
+                                  triggerToast(`🚚 Consignment #${or.id} updated: Shipped`, 'success');
+                                }}
+                                className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded font-black text-[10px] uppercase tracking-wider"
+                              >
+                                Dispatch Consignment
+                              </button>
+                            )}
+                            {or.status === 'Shipped' && (
+                              <button 
+                                onClick={() => {
+                                  setOrders(orders.map(o => o.id === or.id ? { ...o, status: 'Delivered' } : o));
+                                  triggerToast(`🎉 Consignment #${or.id} marked as Delivered`, 'success');
+                                }}
+                                className="bg-emerald-800 text-white px-3 py-1.5 rounded font-black text-[10px] uppercase tracking-wider"
+                              >
+                                Mark Delivered
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+            </div>
+          )}
+
+        </div>
+      )}
+
+      {/* ======================================= */}
+      {/* 3. ADMIN PORTAL PAGES                  */}
+      {/* ======================================= */}
+      {activeRoute.startsWith('/admin') && (
+        <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fade-in">
+          
+          {/* ADMIN TITLE BANNER */}
+          <div className="bg-gradient-to-r from-rose-600 to-indigo-800 text-white p-6 rounded-lg shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h2 className="text-2xl font-black uppercase tracking-tight">Enterprise Operations Desk</h2>
+              <p className="text-xs text-rose-100 mt-1">Audit merchant legal applications, change discount coupons, resolve transaction disputes, and manage platform banners.</p>
+            </div>
+            {adminUser && (
+              <div className="bg-rose-950/60 border border-rose-500/30 p-2.5 rounded text-xs text-right">
+                <span className="bg-yellow-400 text-slate-950 font-black px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider block w-fit ml-auto mb-1">
+                  Root Admin
+                </span>
+                <p className="font-extrabold">{adminUser.name}</p>
+              </div>
+            )}
+          </div>
+
+          {/* ADMIN LOGIN */}
+          {activeRoute === '/admin/login' && (
+            <div className="max-w-md mx-auto bg-white dark:bg-slate-800 p-8 rounded-lg shadow-md border dark:border-slate-700 space-y-6">
+              <div className="text-center space-y-2">
+                <span className="text-3xl">👑</span>
+                <h3 className="text-lg font-bold uppercase tracking-wide">Enterprise operations Sign In</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase text-rose-500">Authorized Personnel Only</p>
+              </div>
+
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                setAdminUser({ id: 'adm-01', name: 'Root Administrator' });
+                triggerToast('🔓 System controls unlocked. Welcome back, Admin.', 'success');
+                setActiveRoute('/admin/dashboard');
+              }} className="space-y-4 text-xs">
+                <div>
+                  <label className="block text-slate-400 uppercase mb-1 font-bold">Operator ID</label>
+                  <input 
+                    type="text" 
+                    required
+                    defaultValue="BUYZONE-SYS-01"
+                    className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 uppercase mb-1 font-bold">Onboarding Security PIN</label>
+                  <input 
+                    type="password" 
+                    required
+                    defaultValue="••••••"
+                    className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded border dark:border-slate-700 focus:outline-none"
+                  />
+                </div>
+
+                <button 
+                  type="submit"
+                  className="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold p-3 rounded text-xs uppercase tracking-wider shadow"
+                >
+                  Verify compliance credentials
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* ADMIN ACTIVE PANELS */}
+          {adminUser && (
+            <div className="space-y-8">
+              
+              {/* Tabs list */}
+              <div className="flex flex-wrap border-b dark:border-slate-800 text-xs">
+                <button 
+                  onClick={() => setActiveRoute('/admin/dashboard')}
+                  className={`px-4 py-3 font-bold uppercase tracking-wider border-b-2 ${activeRoute === '/admin/dashboard' ? 'border-rose-600 text-rose-600' : 'border-transparent text-slate-400'}`}
+                >
+                  📊 KPI Platform statistics
+                </button>
+                <button 
+                  onClick={() => setActiveRoute('/admin/sellers')}
+                  className={`px-4 py-3 font-bold uppercase tracking-wider border-b-2 ${activeRoute === '/admin/sellers' ? 'border-rose-600 text-rose-600' : 'border-transparent text-slate-400'}`}
+                >
+                  🏪 Seller Approval Desk
+                </button>
+                <button 
+                  onClick={() => setActiveRoute('/admin/coupons')}
+                  className={`px-4 py-3 font-bold uppercase tracking-wider border-b-2 ${activeRoute === '/admin/coupons' ? 'border-rose-600 text-rose-600' : 'border-transparent text-slate-400'}`}
+                >
+                  🎟️ Promos & Coupons
+                </button>
+                <button 
+                  onClick={() => setActiveRoute('/admin/reports')}
+                  className={`px-4 py-3 font-bold uppercase tracking-wider border-b-2 ${activeRoute === '/admin/reports' ? 'border-rose-600 text-rose-600' : 'border-transparent text-slate-400'}`}
+                >
+                  📄 Compliance Reports
+                </button>
+                <button 
+                  onClick={() => { setAdminUser(null); setActiveRoute('/admin/login'); }}
+                  className="px-4 py-3 font-bold uppercase text-red-500 hover:bg-red-50 ml-auto"
+                >
+                  Exit Control Mode
+                </button>
+              </div>
+
+              {/* ADMIN CONTROL VIEWS */}
+              
+              {/* VIEW A: KPI Platform statistics */}
+              {activeRoute === '/admin/dashboard' && (
+                <div className="space-y-6">
+                  
+                  {/* Stats counts */}
+                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 text-xs font-bold text-slate-800 dark:text-slate-100">
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border dark:border-slate-700 shadow-sm">
+                      <p className="text-slate-400 uppercase text-[9px]">Gross Platform Volume</p>
+                      <h4 className="text-xl font-black text-rose-600 mt-1">₹8,65,000</h4>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border dark:border-slate-700 shadow-sm">
+                      <p className="text-slate-400 uppercase text-[9px]">Aproved Vendors</p>
+                      <h4 className="text-xl font-black text-blue-600 mt-1">{sellers.length} Shops</h4>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border dark:border-slate-700 shadow-sm">
+                      <p className="text-slate-400 uppercase text-[9px]">Active Catalog Entries</p>
+                      <h4 className="text-xl font-black mt-1">{products.length} Items</h4>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border dark:border-slate-700 shadow-sm">
+                      <p className="text-slate-400 uppercase text-[9px]">Active Coupons</p>
+                      <h4 className="text-xl font-black text-emerald-600 mt-1">{coupons.length} Promo Codes</h4>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border dark:border-slate-700 shadow-sm">
+                      <p className="text-slate-400 uppercase text-[9px]">Pending Applications</p>
+                      <h4 className="text-xl font-black text-amber-500 mt-1">
+                        {applications.filter(a => a.status === 'Pending').length} Pending
+                      </h4>
+                    </div>
+                  </div>
+
+                  {/* Growth charts */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-lg border dark:border-slate-700 shadow-sm">
+                      <h4 className="font-bold text-xs uppercase text-slate-500 mb-4">Monthly Transaction Growth</h4>
+                      {/* Interactive dynamic chart */}
+                      <div className="h-44 flex items-end justify-between pt-6">
+                        {[20, 45, 30, 60, 85, 90, 110, 120, 150].map((val, idx) => (
+                          <div key={idx} className="flex flex-col items-center flex-1 group">
+                            <div className="bg-rose-500 w-5 rounded-t transition-all group-hover:bg-rose-400" style={{ height: `${val}px` }} />
+                            <span className="text-[9px] text-slate-400 mt-1">M{idx+1}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-white dark:bg-slate-800 p-5 rounded-lg border dark:border-slate-700 shadow-sm">
+                      <h4 className="font-bold text-xs uppercase text-slate-500 mb-4">Vendor Onboarding Funnel</h4>
+                      <div className="h-44 flex items-end justify-between pt-6">
+                        {[50, 40, 75, 90, 80, 110, 130, 140, 160].map((val, idx) => (
+                          <div key={idx} className="flex flex-col items-center flex-1 group">
+                            <div className="bg-indigo-500 w-5 rounded-t transition-all group-hover:bg-indigo-400" style={{ height: `${val}px` }} />
+                            <span className="text-[9px] text-slate-400 mt-1">M{idx+1}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+
+              {/* VIEW B: Seller Approval Desk */}
+              {activeRoute === '/admin/sellers' && (
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm space-y-4">
+                  <h4 className="font-bold text-sm uppercase border-b pb-2 dark:border-slate-700">Business Registration Compliance List</h4>
+                  
+                  <div className="space-y-4">
+                    {applications.map(app => (
+                      <div key={app.id} className="p-5 rounded bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 space-y-4 text-xs">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                          <div className="flex items-center gap-3">
+                            <span className="text-3xl">🏢</span>
+                            <div>
+                              <h5 className="font-bold text-sm">{app.shopName}</h5>
+                              <p className="text-slate-400">Owner: {app.ownerName} | Email: {app.email} | Mobile: {app.mobile}</p>
+                            </div>
+                          </div>
+                          <span className={`px-2.5 py-1 rounded font-black text-[9px] uppercase ${app.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                            {app.status}
+                          </span>
+                        </div>
+
+                        {/* Audit specific registration credentials */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-[11px] pt-3 border-t dark:border-slate-800">
+                          <div>
+                            <span className="text-slate-400 block font-bold uppercase text-[9px]">GSTIN Compliance</span>
+                            <span className="font-mono font-extrabold">{app.gst}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400 block font-bold uppercase text-[9px]">PAN card ID</span>
+                            <span className="font-mono font-extrabold">{app.pan}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400 block font-bold uppercase text-[9px]">Verification Documents</span>
+                            <span className="text-blue-600 font-extrabold hover:underline cursor-pointer flex items-center gap-1">
+                              <ShieldCheck size={14} /> Audited & Verified
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400 block font-bold uppercase text-[9px]">Warehouse Location</span>
+                            <span className="font-mono text-slate-500 truncate block">{app.address}</span>
+                          </div>
+                        </div>
+
+                        {/* Action buttons */}
+                        {app.status === 'Pending' && (
+                          <div className="flex gap-2 pt-2">
+                            <button 
+                              onClick={() => {
+                                // Approve application
+                                setApplications(applications.map(item => item.id === app.id ? { ...item, status: 'Approved' } : item));
+                                // Add to approved vendors database list
+                                const newMerchant = {
+                                  id: `s-${Date.now()}`,
+                                  name: app.shopName,
+                                  owner: app.ownerName,
+                                  gst: app.gst,
+                                  pan: app.pan,
+                                  status: 'Approved',
+                                  email: app.email,
+                                  sales: 0,
+                                  walletBalance: 0,
+                                  shopDescription: 'High quality multi-vendor verified supply store'
+                                };
+                                setSellers([...sellers, newMerchant]);
+                                triggerToast(`✅ Onboarding Approved! ${app.shopName} is now live on the catalog.`, 'success');
+                              }}
+                              className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-4 py-2 rounded text-[10px] uppercase tracking-wider shadow"
+                            >
+                              Approve Brand Application
+                            </button>
+                            <button 
+                              onClick={() => {
+                                setApplications(applications.map(item => item.id === app.id ? { ...item, status: 'Rejected' } : item));
+                                triggerToast(`❌ Application Rejected for ${app.shopName}`, 'warning');
+                              }}
+                              className="bg-red-600 hover:bg-red-500 text-white font-extrabold px-4 py-2 rounded text-[10px] uppercase tracking-wider"
+                            >
+                              Reject Compliance Application
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* VIEW C: Promos & Coupons */}
+              {activeRoute === '/admin/coupons' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-xs">
+                  
+                  {/* Create Coupon block */}
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm h-fit">
+                    <h4 className="font-bold text-sm uppercase border-b pb-2 dark:border-slate-700">Generate Coupon Voucher</h4>
+                    
+                    <form onSubmit={(e) => {
+                      e.preventDefault();
+                      const code = e.target.code.value.trim().toUpperCase();
+                      const val = Number(e.target.val.value);
+                      const min = Number(e.target.min.value);
+                      const type = e.target.type.value;
+
+                      if (!code || !val) {
+                        triggerToast('❌ Promo code value missing', 'error');
+                        return;
+                      }
+
+                      const newC = {
+                        code,
+                        type,
+                        value: val,
+                        minPurchase: min,
+                        desc: type === 'percentage' ? `${val}% OFF on orders over ₹${min}` : `Flat ₹${val} OFF on orders over ₹${min}`
+                      };
+
+                      setCoupons([...coupons, newC]);
+                      triggerToast(`🎉 Promo Voucher "${code}" activated platform-wide!`, 'success');
+                      
+                      e.target.reset();
+                    }} className="space-y-4 pt-4 text-xs font-bold">
+                      <div>
+                        <label className="block text-slate-400 uppercase mb-1">Coupon Promo Code *</label>
+                        <input 
+                          name="code"
+                          type="text" 
+                          required
+                          placeholder="e.g. FLASH800"
+                          className="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 focus:outline-none uppercase"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-slate-400 uppercase mb-1">Discount Type</label>
+                          <select name="type" className="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 focus:outline-none">
+                            <option value="percentage">Percentage (%)</option>
+                            <option value="flat">Flat Amount (₹)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-slate-400 uppercase mb-1">Coupon Value *</label>
+                          <input 
+                            name="val"
+                            type="number" 
+                            required
+                            placeholder="e.g. 15 or 500"
+                            className="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-400 uppercase mb-1">Min order requirement (₹)</label>
+                        <input 
+                          name="min"
+                          type="number" 
+                          defaultValue="1000"
+                          className="w-full bg-slate-50 dark:bg-slate-900 p-2.5 rounded border dark:border-slate-700 focus:outline-none"
+                        />
+                      </div>
+
+                      <button 
+                        type="submit"
+                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold p-2.5 rounded uppercase tracking-wider"
+                      >
+                        Activate promo voucher
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Coupon Lists */}
+                  <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm space-y-4">
+                    <h4 className="font-bold text-sm uppercase border-b pb-2 dark:border-slate-700">Platform Active Discount Vouchers</h4>
+                    <div className="space-y-3">
+                      {coupons.map(c => (
+                        <div key={c.code} className="p-3.5 rounded bg-slate-50 dark:bg-slate-900 border dark:border-slate-700 flex justify-between items-center">
+                          <div>
+                            <span className="font-extrabold text-blue-600 dark:text-blue-400 uppercase">{c.code}</span>
+                            <p className="text-[10px] text-slate-400 mt-0.5">{c.desc}</p>
+                          </div>
+                          <button 
+                            onClick={() => {
+                              setCoupons(coupons.filter(item => item.code !== c.code));
+                              triggerToast(`🗑️ Coupon ${c.code} deleted`, 'warning');
+                            }}
+                            className="text-red-500 hover:text-red-600 p-1"
+                          >
+                            <Trash size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                </div>
+              )}
+
+              {/* VIEW D: Compliance Reports */}
+              {activeRoute === '/admin/reports' && (
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border dark:border-slate-700 shadow-sm space-y-6 text-xs">
+                  <div className="border-b pb-3 dark:border-slate-700">
+                    <h4 className="font-bold text-sm uppercase">Compliance Document Auditing Center</h4>
+                    <p className="text-slate-400">Download complete ledger metrics and active platform audit documents instantly.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs font-bold">
+                    <div className="bg-slate-50 dark:bg-slate-900 p-5 rounded border dark:border-slate-700 space-y-3">
+                      <FileText className="text-blue-600" size={28} />
+                      <h5 className="uppercase tracking-wider">Marketplace Gross Sales Ledger</h5>
+                      <p className="text-[11px] text-slate-500 leading-relaxed font-normal">Complete platform sales audit logs for quarterly commercial tax compliance returns.</p>
+                      <button 
+                        onClick={() => triggerToast('📄 Downloded dynamic platform gross sales ledger!', 'success')}
+                        className="bg-slate-800 hover:bg-slate-700 text-white w-full py-2 rounded uppercase text-[10px]"
+                      >
+                        Download PDF Ledger
+                      </button>
+                    </div>
+
+                    <div className="bg-slate-50 dark:bg-slate-900 p-5 rounded border dark:border-slate-700 space-y-3">
+                      <Building className="text-emerald-600" size={28} />
+                      <h5 className="uppercase tracking-wider">Active Vendor Onboarding Log</h5>
+                      <p className="text-[11px] text-slate-500 leading-relaxed font-normal">List of verified physical warehouses, GST registration codes and legal compliance files.</p>
+                      <button 
+                        onClick={() => triggerToast('📊 Downloded verified vendor onboarding Excel sheet!', 'success')}
+                        className="bg-slate-800 hover:bg-slate-700 text-white w-full py-2 rounded uppercase text-[10px]"
+                      >
+                        Download Excel Sheet
+                      </button>
+                    </div>
+
+                    <div className="bg-slate-50 dark:bg-slate-900 p-5 rounded border dark:border-slate-700 space-y-3">
+                      <Landmark className="text-indigo-600" size={28} />
+                      <h5 className="uppercase tracking-wider">Bank Settlement Clearances</h5>
+                      <p className="text-[11px] text-slate-500 leading-relaxed font-normal">Detailed transactional settlement files showing cleared commissions and retail payouts.</p>
+                      <button 
+                        onClick={() => triggerToast('📄 Payout settlement clearings downloaded!', 'success')}
+                        className="bg-slate-800 hover:bg-slate-700 text-white w-full py-2 rounded uppercase text-[10px]"
+                      >
+                        Download Clearances CSV
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+
+            </div>
+          )}
+
+        </div>
+      )}
+
+      {/* DYNAMIC COMPANION CHAT DISPATCH SUPPORT MODAL */}
+      <div className="fixed bottom-4 right-4 z-50">
+        {!chatOpen ? (
+          <button 
+            onClick={() => setChatOpen(true)}
+            className="bg-blue-600 hover:bg-blue-500 text-white p-3.5 rounded-full shadow-2xl flex items-center gap-1.5 transition-all scale-100 hover:scale-105"
+          >
+            <MessageSquare size={18} />
+            <span className="text-xs font-black uppercase">Live Chat Support</span>
+          </button>
+        ) : (
+          <div className="bg-white dark:bg-slate-800 w-80 rounded-lg shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden animate-fade-in text-xs">
+            {/* Header */}
+            <div className="bg-blue-600 text-white p-3.5 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="font-extrabold uppercase">BUYZONE Live Agent</span>
+              </div>
+              <button onClick={() => setChatOpen(false)} className="text-white/80 hover:text-white">
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Message Area */}
+            <div className="p-4 h-60 overflow-y-auto space-y-3 bg-slate-50 dark:bg-slate-900 flex flex-col">
+              {chatMessages.map((msg, i) => (
+                <div 
+                  key={i}
+                  className={`p-2.5 rounded max-w-[80%] leading-relaxed ${msg.sender === 'bot' ? 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 self-start border dark:border-slate-700' : 'bg-blue-600 text-white self-end'}`}
+                >
+                  {msg.text}
+                </div>
+              ))}
+            </div>
+
+            {/* Input Footer */}
+            <div className="p-3 border-t dark:border-slate-700 bg-white dark:bg-slate-800 flex gap-1.5">
+              <input 
+                type="text" 
+                value={currentChatInput}
+                onChange={(e) => setCurrentChatInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
+                placeholder="Type query (e.g. order tracking)..."
+                className="flex-1 bg-slate-50 dark:bg-slate-900 p-2 border dark:border-slate-700 rounded focus:outline-none"
+              />
+              <button 
+                onClick={handleSendChat}
+                className="bg-blue-600 text-white px-3 rounded hover:bg-blue-500"
+              >
+                <Send size={14} />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* FOOTER */}
+      <footer className="bg-slate-900 text-slate-400 text-xs py-10 border-t border-slate-800/80 mt-16">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="space-y-3">
+            <span className="text-xl font-black italic text-white">
+              BUY<span className="text-yellow-400">ZONE</span>
+            </span>
+            <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
+              Experience high-fidelity multi-vendor commercial retail logistics. Auditing and delivering secure, verified consumer dispatch parameters worldwide.
+            </p>
+          </div>
+          <div>
+            <h5 className="font-bold text-white uppercase text-[10px] tracking-wider mb-3">Consumer Solutions</h5>
+            <ul className="space-y-2">
+              <li><button onClick={() => setActiveRoute('/customer/home')} className="hover:text-white text-left">Browse Marketplace Catalog</button></li>
+              <li><button onClick={() => setActiveRoute('/customer/orders')} className="hover:text-white text-left">Track Consignment Status</button></li>
+              <li><button onClick={() => setActiveRoute('/customer/dashboard')} className="hover:text-white text-left">Loyalty Point Accruals</button></li>
+            </ul>
+          </div>
+          <div>
+            <h5 className="font-bold text-white uppercase text-[10px] tracking-wider mb-3">Merchant Systems</h5>
+            <ul className="space-y-2">
+              <li><button onClick={() => setActiveRoute('/seller/register')} className="hover:text-white text-left font-black text-emerald-400">Apply for retail rights</button></li>
+              <li><button onClick={() => setActiveRoute('/seller/login')} className="hover:text-white text-left">Merchant login</button></li>
+              <li><a href="#" className="hover:text-white block">Tax compliance rules</a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 className="font-bold text-white uppercase text-[10px] tracking-wider mb-3">Global Corporate HQ</h5>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              BUYZONE Enterprises Private Limited, Building-7, Cyber City logistics Enclave, Outer Ring Road, Bengaluru, Karnataka, India - 560103.
+            </p>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 text-center border-t border-slate-800/60 pt-6 mt-8 text-slate-600 text-[10px]">
+          &copy; 2026 BUYZONE Multi-Vendor Platform, Inc. All rights reserved. Developed under sandboxed simulation environment.
+        </div>
+      </footer>
+
+    </div>
+  );
+}

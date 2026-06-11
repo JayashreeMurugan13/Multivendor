@@ -1,0 +1,83 @@
+
+> buyzone-frontend@0.1.0 dev
+> next dev -p 3002
+
+   ▲ Next.js 15.0.3
+   - Local:        http://localhost:3002
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 2.7s
+ ○ Compiling / ...
+ ✓ Compiled / in 6.4s (1020 modules)
+ GET / 200 in 6824ms
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../typescript/lib/typescript' in c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build for build dependencies doesn't lead to expected result 'C:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\typescript\lib\typescript.js', but to 'c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\typescript\lib\typescript.js' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../typescript/lib/typescript (expected C:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\typescript\lib\typescript.js)
+<w>  at file dependencies c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\load-jsconfig.js
+<w>  at file c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\load-jsconfig.js
+<w>  at file dependencies c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\webpack-config.js
+<w>  at file c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\webpack-config.js
+<w>  at file dependencies c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../typescript/lib/typescript' in c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build for build dependencies doesn't lead to expected result 'C:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\typescript\lib\typescript.js', but to 'c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\typescript\lib\typescript.js' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../typescript/lib/typescript (expected C:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\typescript\lib\typescript.js)
+<w>  at file dependencies c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\load-jsconfig.js
+<w>  at file c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\load-jsconfig.js
+<w>  at file dependencies c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\server\dev\turbopack-utils.js
+<w>  at file c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\server\dev\turbopack-utils.js
+<w>  at file dependencies c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\swc\index.js
+<w>  at file c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\swc\index.js
+<w>  at file dependencies c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\webpack\loaders\next-barrel-loader.js
+<w>  at file c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\webpack\loaders\next-barrel-loader.js
+<w>  at resolve commonjs c:\Users\ADMIN\Downloads\Final-Project\frontend\node_modules\next\dist\build\webpack\loaders\next-barrel-loader.js
+ ✓ Compiled /_not-found in 375ms (1014 modules)
+ GET /sw.js 404 in 469ms
+ GET / 200 in 105ms
+ ○ Compiling /customer/login ...
+ ✓ Compiled /customer/login in 857ms (1031 modules)
+ GET /customer/login 200 in 948ms
+ GET /customer/login 200 in 40ms
+ GET /customer/login 200 in 30ms
+ ○ Compiling /shop ...
+ ✓ Compiled /shop in 563ms (1046 modules)
+ GET /shop?category=Home+%26+Living 200 in 642ms
+ ✓ Compiled in 729ms (1057 modules)
+ GET /shop?category=Home+%26+Living 200 in 53ms
+ GET /customer/login 200 in 29ms
+ GET /customer/login 200 in 41ms
+ GET /customer/login 200 in 32ms
+ ○ Compiling /seller/register ...
+ ✓ Compiled /seller/register in 4s (1784 modules)
+ GET /seller/register 200 in 4035ms
+ GET /seller/register 200 in 25ms
+ GET /seller/register 200 in 19ms
+ ✓ Compiled /seller/login in 494ms (1795 modules)
+ GET /seller/login 200 in 548ms
+ GET /seller/login 200 in 16ms
+ GET / 200 in 261ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 549ms (1798 modules)
+ GET /sw.js 404 in 782ms
+ GET /shop?category=Electronics 200 in 28ms
+ ✓ Compiled in 425ms (849 modules)
+ GET /shop?category=Electronics 200 in 31ms
+ ✓ Compiled in 281ms (849 modules)
+ GET /shop?category=Electronics 200 in 33ms
+ GET /customer/login 200 in 36ms
+ GET /customer/login 200 in 30ms
+ GET /customer/login 200 in 21ms
+ ✓ Compiled in 764ms (847 modules)
+ GET /customer/login 200 in 46ms
+ ✓ Compiled in 466ms (847 modules)
+ GET /customer/login 200 in 30ms
+ ✓ Compiled in 1124ms (1431 modules)
+ GET /customer/login 200 in 1005ms
+ GET /customer/login 200 in 24ms
+ GET /shop 200 in 21ms
+ GET /shop 200 in 230ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1123ms (1434 modules)
+ GET /sw.js 404 in 1280ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 24ms
+[?25h
