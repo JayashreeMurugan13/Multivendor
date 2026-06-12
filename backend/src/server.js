@@ -9,17 +9,27 @@ const rateLimit = require('express-rate-limit');
 
 const path = require('path');
 const connectDB = require('./config/db');
-const { initSocket } = require('./socket/index');
 const errorHandler = require('./middleware/error');
 
 const app = express();
 const server = http.createServer(app);
 
 connectDB();
-initSocket(server);
+
+const isVercel = process.env.VERCEL === '1';
+if (!isVercel) {
+  const { initSocket } = require('./socket/index');
+  initSocket(server);
+}
 
 app.use(helmet({ contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], imgSrc: ["'self'", "data:", "blob:", "http://localhost:5000", "https://images.unsplash.com", "https://res.cloudinary.com", "*"] } } }));
-app.use(cors({ origin: [process.env.CLIENT_URL, 'http://localhost:3000', 'http://localhost:3002'], credentials: true }));
+const allowedOrigins = [
+  process.env.CLIENT_URL?.trim(),
+  'https://frontend-lemon-beta-lbwk37v0df.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:3002',
+].filter(Boolean);
+app.use(cors({ origin: (origin, cb) => cb(null, true), credentials: true }));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -47,5 +57,9 @@ app.get('/health', (req, res) => res.json({ status: 'ok', service: 'BUYZONE API'
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`BUYZONE server running on port ${PORT}`));
+if (!isVercel) {
+  const PORT = process.env.PORT || 5000;
+  server.listen(PORT, () => console.log(`BUYZONE server running on port ${PORT}`));
+}
+
+module.exports = app;
